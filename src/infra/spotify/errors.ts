@@ -1,5 +1,6 @@
-import { SpotifyErrorResponse } from '@infra/spotify/spotifyApiUtils';
-import * as R                   from 'ramda';
+import { RawError }                                        from '@/shared';
+import { SpotifyErrorResponse, spotifyErrorResponseCodec } from '@infra/spotify/spotifyApiUtils';
+import * as R                                              from 'ramda';
 
 
 export enum SpotifyErrorNames {
@@ -12,14 +13,24 @@ export enum SpotifyErrorNames {
     PERSISTENCE = 'PERSISTENCE',
     RUNTIME = 'RUNTIME',
     UNKNOWN_RESPONSE = 'UNKNOWN_RESPONSE',
+    RATE_LIMIT = "RATE_LIMIT"
 }
 
 
-// todo: there has to be a better way to type the orig field
-export type SpotifyError = {
-    message: string;
-    name: SpotifyErrorNames;
-    orig: any;
+export type SpotifyError = RawError<SpotifyErrorNames>
+
+export const responseErrorToSpotifyError: (err: SpotifyErrorResponse) => SpotifyError = err => {
+    return spotifyErrorResponseCodec.decode(err)
+        .map(err => {
+            switch (err.statusCode) {
+                case 429:
+                    return errorFactory.rateLimit(err.message, err)
+                default:
+                    return errorFactory.unknown(err.message)
+            }
+        })
+        .mapLeft(errorFactory.unknown)
+        .extract()
 }
 
 const createError:
@@ -44,5 +55,6 @@ export const errorFactory = {
         message: errResp.message,
         orig: errResp
     }),
-    noResult: createError(SpotifyErrorNames.NO_RESULT)
+    noResult: createError(SpotifyErrorNames.NO_RESULT),
+    rateLimit: createError(SpotifyErrorNames.RATE_LIMIT),
 };

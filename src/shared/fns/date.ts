@@ -1,5 +1,14 @@
-import * as P from "purify-ts";
-import * as R from "ramda";
+import * as P                           from 'purify-ts';
+import { always, Just, Maybe, Nothing } from 'purify-ts';
+import * as R                           from 'ramda';
+
+
+export const parseDateSafe: (s: string) => Maybe<Date> = s => P.Maybe.fromNullable(s)
+    .map(Date.parse)
+    .chain(R.ifElse(
+        isNaN,
+        always(Nothing),
+        (n: number) => Just(new Date(n))));
 
 /**
  * Return true if provided string can be parsed into Date
@@ -7,15 +16,5 @@ import * as R from "ramda";
  * @param s iso string
  */
 export const isDateString = (s: string) => {
-    return R.allPass([
-        R.is(String),
-        R.pipe(R.split(""), R.length, R.equals(24)),
-        s => {
-            return (new Date(Date.parse(s))).toJSON() === s;
-        }
-    ])(s);
+    return parseDateSafe(s).isJust();
 };
-export const parseDateStringSafe: (dateStr: string) => P.Either<string, Date> = R.ifElse(isDateString,
-    s => P.Right(new Date(Date.parse(s))),
-    e => P.Left(`invalid isoString: ${e}`)
-);

@@ -11,10 +11,29 @@ export type RedditConfig = {
     userAgent: string
 }
 
-export type TrackSubmissionDetails = {
-    submission: Snoowrap.Submission,
+
+export type SubmissionSummary = Pick<Snoowrap.Submission,
+    'id' | 'title' | 'permalink' | 'created_utc' | 'score' | 'upvote_ratio'>
+
+
+export type TrackSubmissionSummary = {
+    submission: SubmissionSummary;
     trackInfo: TrackInfo,
 }
+
+export interface ListingOptions {
+    limit?: number;
+    after?: string;
+    before?: string;
+    show?: string;
+    count?: number;
+}
+
+export type ListingTimes = "all" | "year" | "month" | "week" | "day"
+
+export type TimeFrameListing = 'top'
+
+export type NonTimeFrameListing = 'hot' | 'new' | 'rising'
 
 
 export { RedditErrorTypes, RedditError };

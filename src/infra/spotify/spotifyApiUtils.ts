@@ -16,12 +16,7 @@ export type SpotifyApiPromiseValue<T extends SpotifyApiMethodName> = PromiseValu
 // Errors
 
 export type SpotifyErrorResponse = {
-    body: {
-        error: {
-            message: string,
-            status: number,
-        }
-    },
+    body: unknown;
     message: string;
     headers: {
         [header: string]: string
@@ -32,12 +27,7 @@ export type SpotifyErrorResponse = {
 type SpotifyErrorResponseCodec = P.Codec<P.FromType<SpotifyErrorResponse>>;
 
 export const spotifyErrorResponseCodec: SpotifyErrorResponseCodec = P.Codec.interface({
-    body: P.Codec.interface({
-        error: P.Codec.interface({
-            message: P.string,
-            status: P.number
-        })
-    }),
+    body: P.unknown,
     message: P.string,
     headers: P.record(P.string, P.string),
     statusCode: P.number,

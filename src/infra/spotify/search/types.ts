@@ -24,4 +24,4 @@ export interface SearchService {
 }
 
 
-export { TrackSearchResponse }; // target
+export { TrackSearchResponse };

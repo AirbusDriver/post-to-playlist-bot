@@ -16,3 +16,9 @@ export type PlaylistInfo = {
     tracks: TrackInfo[];
 }
 
+export type PostInfo = {
+    title: string,
+    id: string,
+    url: string,
+}
+

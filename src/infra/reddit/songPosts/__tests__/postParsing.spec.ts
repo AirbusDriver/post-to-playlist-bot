@@ -25,10 +25,18 @@ const shouldMatchTitleCases = [
         '(2021) A War Inside - ‘Apeiron’ (For fans of Currents/Architects/Northlane)',
         [ 'A War Inside', 'Apeiron' ]
     ],
-    // [
-    //     "SAVE - Ложь прошла сквозь стену (FFO: Melo-core, Slavs, Men skirts, old Jinjer, Threat Signal)",
-    //     ["SAVE","Ложь прошла сквозь стену" ]
-    // ]
+    [
+        'Stavesacre - Colt .45 [Alternative Rock/Hard Rock/Hardcore] (1997)',
+        ['Stavesacre', 'Colt .45']
+    ],
+    [
+        'Daedric -- Sepulchre [Electronic Rock] (2021)',
+        ['Daedric', 'Sepulchre']
+    ],
+    [
+        'Hulkoff - Jormungandr [Power metal] (2021)',
+        ['Hulkoff', 'Jormungandr']
+    ]
 ];
 
 const shouldNotMatchTitleCases = [
@@ -68,7 +76,7 @@ describe('titleToTrackInfoSafe', () => {
     it.each(shouldNotMatchTitleCases)('should return Nothing: %s', (input) => {
         const result = titleToTrackInfoSafe(input);
 
-        expect(result.isNothing()).toBe(true);
+        expect(result.extractNullable()).toBe(null);
     });
 });
 

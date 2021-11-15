@@ -1,7 +1,13 @@
 import SpotifyWebApi                   from 'spotify-web-api-node';
-import { SearchService }               from './types';
 import { createSearchForTrackCommand } from './searchForTrack.command';
+import { SearchService }               from './types';
 
+
+export {
+    SearchService
+};
+
+// todo: inline a caching fn
 
 /**
  * Return a SearchService with an authorized client

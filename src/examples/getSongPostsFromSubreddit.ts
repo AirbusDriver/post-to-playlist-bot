@@ -1,46 +1,3 @@
-# Post-to-Playlist-Bot
-
-## What's This?
-
-This is a work in progress. It's really just a playground for me to figure out an acceptable FP architecture that looses
-operates like ports/adapters. But eventually it will be a deployable Node app that manage playlists from your personal
-Spotify account by syncing the music that is ItemDetails to Reddit. A simple config file will determine which playlists
-are to be managed and by which source. You can combine multiple subreddit sources as well as do things like leave the
-top 10 songs in the playlist, while keeping the current "hot 50" song in step with the playlist.
-
-## Roadmap
-
-- [ ] `Music` module commands and service implementation
-    - [x] `/api/music/song-posts` vertical slice
-    - [ ] `/api/music/track-locations/:tracks[]` endpoint
-        - [ ] `/music/service`
-            - [ ] `/music/service/trackLocations.command`
-    - [ ] `/api/music/*` caching
-- [ ] Express server scheduling
-- [ ] CLI
-- [ ] Email/Notification service
-- [ ] Yaml parsing
-- [ ] UI
-    - [ ] Config editing via UI
-    - [ ] Log reading
-    - [ ] OAuth2 support for Spotify and Reddit via UI
-
-## Usage
-
-Currently the library is being fleshed out, but this is a basic example of how the services are used under the
-hood. [Purify-ts](https://gigobyte.github.io/purify/) is used extensively as monad library and the rest of the library
-will continue to be written in the functional style using it. Because of this, you can use the escape
-hatch `Either.extract()` if you want to handle the errors/value contained in the monad in the more common imperative
-style.
-
-## Example
-
-#### More examples can be found in the src/examples folder
-
-*This **will** break. Soon.*
-
-```typescript
-
 import {
     searchForSongPostsRoot,
     Env as searchForSongEnv
@@ -87,7 +44,7 @@ const main = P.EitherAsync(async ctx => {
 main.ifRight(resp => console.log(resp.extract())).run();
 
 
-//
+// Logs...
 // [
 //     {
 //         "reddit": {
@@ -229,11 +186,59 @@ main.ifRight(resp => console.log(resp.extract())).run();
 //             "id": "4nA4EL66VXDE6wQvtgWzB3"
 //         }
 //     },
-//     // ...
-// ]
-
-```
-
-## How to Contribute
-
-You don't want any part of this. I don't want any part of this. 
+//     {
+//         "reddit": {
+//             "trackInfo": {
+//                 "artist": "Animosity",
+//                 "title": "The Black Page"
+//             },
+//             "submission": {
+//                 "id": "qvjigf",
+//                 "title": "Animosity - The Black Page",
+//                 "created_utc": 1637100492,
+//                 "permalink": "/r/Deathcore/comments/qvjigf/animosity_the_black_page/",
+//                 "score": 13,
+//                 "upvote_ratio": 0.94
+//             }
+//         },
+//         "track": {
+//             "artist": "Animosity",
+//             "title": "The Black Page"
+//         },
+//         "spotify": {
+//             "item": {
+//                 "title": "The Black Page",
+//                 "artist": "Animosity"
+//             },
+//             "uri": "spotify:track:1Q6q21crre49w7vS4lXHgq",
+//             "id": "1Q6q21crre49w7vS4lXHgq"
+//         }
+//     },
+//     {
+//         "reddit": {
+//             "trackInfo": {
+//                 "artist": "A Night in Texas",
+//                 "title": "The Divine Dichotomy"
+//             },
+//             "submission": {
+//                 "id": "qu55nb",
+//                 "title": "A Night in Texas - The Divine Dichotomy (almost) 6 months later",
+//                 "created_utc": 1636941110,
+//                 "permalink": "/r/Deathcore/comments/qu55nb/a_night_in_texas_the_divine_dichotomy_almost_6/",
+//                 "score": 13,
+//                 "upvote_ratio": 0.82
+//             }
+//         },
+//         "track": {
+//             "artist": "A Night in Texas",
+//             "title": "The Divine Dichotomy"
+//         },
+//         "spotify": {
+//             "item": {
+//                 "title": "Feed the Lions",
+//                 "artist": "A Night In Texas"
+//             },
+//             "uri": "spotify:track:4HZu65LqF18Jg5wJQpMpCh",
+//             "id": "4HZu65LqF18Jg5wJQpMpCh"
+//         }
+//     },

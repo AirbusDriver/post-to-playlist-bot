@@ -11,7 +11,7 @@ const createLogger = (nodeEnv: string): winston.Logger => {
     return winston.createLogger({
         level: nodeEnv === 'development' ? 'debug' : 'info',
         transports: [
-            new winston.transports.Console(),
+            new winston.transports.Console({format: winston.format.prettyPrint()}),
         ],
     });
 };
@@ -29,6 +29,6 @@ const _getRootLogger = (): () => winston.Logger => {
 
 export const getRootLogger: () => winston.Logger = _getRootLogger();
 
-export default getRootLogger
+export default getRootLogger;
 
 export type Logger = winston.Logger;

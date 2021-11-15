@@ -1,10 +1,8 @@
-import { or } from 'ramda';
-
-
 export enum RedditErrorTypes {
     CONFIG = 'CONFIG',
     UNKNOWN = 'UNKNOWN',
-    INVALID_REQUEST = 'INVALID_REQUEST'
+    INVALID_REQUEST = 'INVALID_REQUEST',
+    SERVICE_ERROR = 'SERVICE_ERROR'
 }
 
 

@@ -37,7 +37,6 @@ export const getSpotifyConfigSafeRoot: GetSpotifyConfigSafeRoot = logger => getS
  */
 const getSpotifyConfigSafeCache = CacheIO.of(() => getSpotifyConfigSafeRoot(logger)(getSettings)())
     .setDescription("getSpotifyConfigSafeCache")
-    .on(event => logger.debug(event))
 
 
 export const getSpotifyConfigSafe = () => getSpotifyConfigSafeCache.getLazy();

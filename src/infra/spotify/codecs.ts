@@ -7,3 +7,4 @@ export const spotifyWebApiCodecFactory = <T>(codec: P.Codec<T>) => P.Codec.inter
     statusCode: P.number,
     headers: P.record(P.string, P.string),
 });
+

@@ -8,6 +8,8 @@ import { refreshAndPersistTokens }         from './refreshTokens.command';
 import { SpotifyAuthTokenService }         from './types';
 
 
+export { SpotifyAuthTokenService };
+
 const logger = getSpotifyLogger().child({module: 'SpotifyAuth'});
 
 type CreateAuthTokenServiceTask = (client: SpotifyWebApi) => SpotifyAuthTokenService
@@ -38,7 +40,7 @@ export const createAuthTokenService: CreateAuthTokenServiceTask =
                 }
                 logger.debug(`auto-refresh interval already exists and start() was called on service`);
             }),
-            stop: EitherAsync<SpotifyError, void>(async ctx => {
+            stop: EitherAsync<SpotifyError, void>(async _ => {
                 if (timer != null) {
                     logger.info(`stopping auto-refresh`);
                     clearInterval(timer);

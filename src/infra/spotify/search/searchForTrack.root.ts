@@ -1,31 +1,29 @@
-import { SpotifyItem, TrackInfo } from '@/music/types';
-import { SpotifyError }           from '@infra/spotify';
-import { errorFactory }           from '@infra/spotify/errors';
-import getSpotifyLogger           from '@infra/spotify/logger';
+import { SpotifyItem, TrackInfo }                from '@/music/types';
+import { SpotifyError, SpotifyErrorNames }       from '@infra/spotify';
+import { errorFactory }                          from '@infra/spotify/errors';
+import getSpotifyLogger                          from '@infra/spotify/logger';
 import {
     spotifyApiTrackSearchResponseCodec,
     TrackItem
-}                                 from '@infra/spotify/search/codecs';
+}                                                from '@infra/spotify/search/codecs';
 import {
     QueryParams,
     SearchForTrackCommandTask,
     SearchTrackDTO,
     TrackSearchResponse
-}                                 from '@infra/spotify/search/types';
-import {
-    mapSpotifyErrorResponseToSpotifyError,
-    SpotifyApiPromiseValue
-}                                 from '@infra/spotify/spotifyApiUtils';
-import { EitherAsync }            from 'purify-ts';
-import R                          from 'ramda';
-import SpotifyWebApi              from 'spotify-web-api-node';
+}                                                from '@infra/spotify/search/types';
+import { mapSpotifyErrorResponseToSpotifyError } from '@infra/spotify/spotifyApiUtils';
+import * as P                                    from 'purify-ts';
+import { EitherAsync }                           from 'purify-ts';
+import R                                         from 'ramda';
+import SpotifyWebApi                             from 'spotify-web-api-node';
 
 
-const logger = getSpotifyLogger().child({module: 'searchForTrack'});
+const logger = getSpotifyLogger().child({module: 'spotify/search/searchForTrack'});
 
 
 const defaultQueryParams: QueryParams = {
-    limit: 10,
+    limit: 5,
     offset: 0,
 };
 
@@ -41,7 +39,6 @@ export type SearchForTrackCommandContext = {
     client: SpotifyWebApi,
 }
 
-export type SearchResponseResult = SpotifyApiPromiseValue<'searchTracks'>
 
 const trackDtoToSearchString = (dto: SearchTrackDTO): string => {
     const {title, artist} = dto;
@@ -49,18 +46,42 @@ const trackDtoToSearchString = (dto: SearchTrackDTO): string => {
 };
 
 
-// SpotifyWebApi -> SearchForTrackTask
+const searchForTrackDtoCodec: P.Codec<P.FromType<SearchTrackDTO>> = P.Codec.interface({
+    title: P.string,
+    artist: P.string,
+});
+
+
 export const searchForTrackWithClient = (client: SpotifyWebApi): DoSearchForTrackTask => (track, query) => {
     return EitherAsync(async ctx => {
-        const queryString = trackDtoToSearchString(track);
+
+        const validatedDto = await ctx.liftEither(searchForTrackDtoCodec.decode(track).mapLeft(err => ({
+            message: err,
+            name: SpotifyErrorNames.BAD_REQUEST,
+            orig: P.parseError(err)
+        })));
+
+        const queryString = trackDtoToSearchString(validatedDto);
 
         const queryParams = query || defaultQueryParams;
 
         const resp = await ctx.fromPromise(EitherAsync(() => client.searchTracks(queryString, queryParams))
+            .ifLeft(logger.error)
             .mapLeft(mapSpotifyErrorResponseToSpotifyError).run());
 
-        return ctx.liftEither(spotifyApiTrackSearchResponseCodec.decode(resp)
+        const results = await ctx.liftEither(spotifyApiTrackSearchResponseCodec.decode(resp)
             .mapLeft<SpotifyError>(errorFactory.unknown));
+
+        logger.debug('spotify track search results', {
+            input: {
+                dto: validatedDto,
+                searchString: queryString,
+                params: queryParams
+            },
+            result: results.body.tracks.items[0]
+        });
+
+        return results;
     });
 };
 

@@ -1,10 +1,13 @@
+import CacheIO                              from '@fns/CacheIO';
 import { SpotifyError }                     from '@infra/spotify/errors';
 import { getClientWithAuthCredentialsTask } from '@infra/spotify/getClient';
 import { createAuthTokenService }           from '@infra/spotify/tokens';
 import { EitherAsync }                      from 'purify-ts';
-import CacheIO                              from '@fns/CacheIO';
 import SpotifyWebApi                        from 'spotify-web-api-node';
 
+
+export { SearchService }           from './search';
+export { SpotifyAuthTokenService } from './tokens';
 
 export const getAuthorizedClientTask = EitherAsync<SpotifyError, SpotifyWebApi>(async ctx => {
     const client = await ctx.fromPromise(getClientWithAuthCredentialsTask.run());
@@ -31,5 +34,5 @@ export default getAuthorizedClientCache;
 export { SpotifyError, SpotifyErrorNames } from './errors';
 export { SpotifyWebApi };
 
-export { createSearchService }  from './search';
-export {createAuthTokenService} from './tokens'
+export { createSearchService }    from './search';
+export { createAuthTokenService } from './tokens';
