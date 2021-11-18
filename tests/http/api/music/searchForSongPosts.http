@@ -1,0 +1,10 @@
+GET http://localhost:{{port}}/api/music/song-posts?subreddit=metalcore&type=hot&limit=20
+Accept: application/json
+
+> {% client.test('returns data array', function (){
+    client.assert(response.body.hasOwnProperty('data'), 'data property is missing');
+    client.assert(response.body.hasOwnProperty('links', 'links porperty is missing'));
+}) %}
+
+
+###

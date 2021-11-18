@@ -1,4 +1,5 @@
 import { SpotifyItem, TrackInfo }                from '@/music/types';
+import { stringifyJsonUnsafe }                   from '@fns/json';
 import { SpotifyError, SpotifyErrorNames }       from '@infra/spotify';
 import { errorFactory }                          from '@infra/spotify/errors';
 import getSpotifyLogger                          from '@infra/spotify/logger';
@@ -14,13 +15,15 @@ import {
 }                                                from '@infra/spotify/search/types';
 import { mapSpotifyErrorResponseToSpotifyError } from '@infra/spotify/spotifyApiUtils';
 import * as P                                    from 'purify-ts';
-import { EitherAsync }                           from 'purify-ts';
+import { EitherAsync, MaybeAsync }               from 'purify-ts';
 import R                                         from 'ramda';
 import SpotifyWebApi                             from 'spotify-web-api-node';
+import { songMemoryCacheCacheIO }                from './trackCache';
 
 
 const logger = getSpotifyLogger().child({module: 'spotify/search/searchForTrack'});
 
+const cache = songMemoryCacheCacheIO.getLazy();
 
 const defaultQueryParams: QueryParams = {
     limit: 5,
@@ -108,11 +111,15 @@ type SearchForTrackCommandRoot = (fnCtx: SearchForTrackCommandContext) => Search
 export const searchForTrackCommandRoot: SearchForTrackCommandRoot =
     fnCtx => (track, query) => EitherAsync(async ctx => {
 
-        return ctx.fromPromise(
-            fnCtx.searchForTrackTaskFactory(fnCtx.client)(track, query)
-                .map(responseToTrackInfo)
-                .run());
-
+        return ctx.fromPromise(MaybeAsync.liftMaybe(cache.get(track))
+            .ifJust(() => logger.debug('returned from cache', {
+                track
+            }))
+            .toEitherAsync(null)
+            .chainLeft(() => fnCtx.searchForTrackTaskFactory(fnCtx.client)(track, query)
+                .map(responseToTrackInfo))
+            .ifRight(resp => cache.set(track, resp))
+            .run());
     });
 
 export { SearchForTrackCommandTask };

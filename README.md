@@ -15,7 +15,7 @@ top 10 songs in the playlist, while keeping the current "hot 50" song in step wi
     - [ ] `/api/music/track-locations/:tracks[]` endpoint
         - [ ] `/music/service`
             - [ ] `/music/service/trackLocations.command`
-    - [ ] `/api/music/*` caching
+    - [x] `/api/music/*` caching
 - [ ] Express server scheduling
 - [ ] CLI
 - [ ] Email/Notification service
