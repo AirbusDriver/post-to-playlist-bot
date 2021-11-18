@@ -27,13 +27,13 @@ const main = EitherAsync(async ctx => {
 
     const songDetails = await ctx.fromPromise(getSongPostsFromSubredditTaskRoot(client)({
         subreddit,
-        searchType: 'hot',
+        type: 'hot',
         opts: {limit: 10}
     }).run());
 
     const songLocationDetails = await Promise.all(
         songDetails.map(track => {
-            return search.searchForTrack(track.trackInfo)
+            return search.searchForTrack({track: track.trackInfo})
                 .ifLeft(console.error)
                 .mapLeft(R.prop('message'))
                 .chain(locList =>

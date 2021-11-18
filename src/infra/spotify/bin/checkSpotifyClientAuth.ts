@@ -1,6 +1,6 @@
-import { spotifyErrorResponseCodec } from '@infra/spotify/spotifyApiUtils';
-import { createAuthTokenService }    from '@infra/spotify/tokens';
-import { EitherAsync }               from 'purify-ts';
+import { spotifyErrorResponseCodec }        from '@infra/spotify/spotifyWebApiUtils';
+import { createAuthTokenService }           from '@infra/spotify/tokens';
+import { EitherAsync }                      from 'purify-ts';
 import * as R                               from 'ramda';
 import { getClientWithAuthCredentialsTask } from '../getClient';
 import getLogger                            from '../logger';

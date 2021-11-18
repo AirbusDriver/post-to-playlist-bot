@@ -1,27 +1,13 @@
-import { SpotifyItem, TrackInfo } from '@/music/types';
-import { SpotifyError }           from '@infra/spotify';
-import { EitherAsync }            from 'purify-ts';
-import { TrackSearchResponse }    from './codecs';
-
-
-export type QueryParams = {
-    offset: number,
-    limit: number,
-}
-
-
-export type SearchTrackDTO = {
-    title: string;
-    artist: string;
-}
-
-
-export type SearchForTrackCommandTask = (track: SearchTrackDTO, query?: QueryParams) => EitherAsync<SpotifyError, SpotifyItem<TrackInfo>[]>
+import { SearchForTrackCommandTask }  from '@infra/spotify/search/searchForTrack.root';
+import { SearchForManyTracksTask }    from './searchForManyTracks.factory';
+import { SpotifyTrackSearchResponse } from './spotifyCodecs';
 
 
 export interface SearchService {
     searchForTrack: SearchForTrackCommandTask;
+    searchForManyTracks: SearchForManyTracksTask;
 }
 
 
-export { TrackSearchResponse };
+export { SpotifyTrackSearchResponse };
+

@@ -1,5 +1,5 @@
 import P                             from 'purify-ts';
-import { trackSearchResponseCodec }  from '../codecs';
+import { trackSearchResponseCodec }  from '../spotifyCodecs';
 import trackSearch_empty_response    from './sampleResponses/trackSearch.emptyResult.raw.json';
 import trackSearch_nonempty_response from './sampleResponses/trackSearch.nonEmptyResult.raw.json';
 

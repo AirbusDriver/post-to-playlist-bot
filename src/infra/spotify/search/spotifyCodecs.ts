@@ -1,8 +1,11 @@
-import { spotifyWebApiCodecFactory } from '@infra/spotify/codecs';
+import { spotifyWebApiCodecFactory } from '@infra/spotify/spotifyWebApiUtils';
 import * as P                        from 'purify-ts';
 
 //// Raw Web API Response Codecs ////
 
+/**
+ * These are the codecs pertaining to the responses from the raw web api.
+ */
 
 // Listings //
 
@@ -44,26 +47,26 @@ const baseSearchItem = P.Codec.interface({
 });
 
 
-const trackArtistItemCodec = P.intersect(
+const spotifyTrackArtistItemCodec = P.intersect(
     baseSearchItem,
     P.Codec.interface({
         href: P.string
     })
 );
 
-const albumItemCodec = P.intersect(
+const spotifyAlbumItemCodec = P.intersect(
     baseSearchItem,
     P.Codec.interface({
-        artists: P.array(trackArtistItemCodec),
+        artists: P.array(spotifyTrackArtistItemCodec),
         release_date: P.string,
     })
 );
 
-export const trackItemCodec = P.intersect(
+export const spotifyTrackItemCodec = P.intersect(
     baseSearchItem,
     P.Codec.interface({
-        album: albumItemCodec,
-        artists: P.array(trackArtistItemCodec),
+        album: spotifyAlbumItemCodec,
+        artists: P.array(spotifyTrackArtistItemCodec),
         external_urls: P.Codec.interface({
             spotify: P.optional(P.string)
         }),
@@ -71,21 +74,26 @@ export const trackItemCodec = P.intersect(
     })
 );
 
-export type TrackItem = P.GetType<typeof trackItemCodec>;
+export type SpotifyTrackItem = P.GetType<typeof spotifyTrackItemCodec>;
 
 
-const trackSearchResponseCodec = P.Codec.interface({
+const spotifyTrackSearchResponseCodec = P.Codec.interface({
     tracks: P.intersect(
         spotifySearchListingCodec,
         P.Codec.interface({
-            items: P.array(trackItemCodec),
+            items: P.array(spotifyTrackItemCodec),
         }))
 });
 
 
 //// SpotifyWebApi Codecs ////
 
-/** Codec for "searchTracks" response */
-export const spotifyApiTrackSearchResponseCodec = spotifyWebApiCodecFactory(trackSearchResponseCodec);
+/**
+ * Use these for anything from the SpotifyWebApi library since the responses
+ * must be wrapped
+ */
 
-export type TrackSearchResponse = P.GetType<typeof spotifyApiTrackSearchResponseCodec>
+/** Codec for "searchTracks" response */
+export const spotifyApiTrackSearchResponseCodec = spotifyWebApiCodecFactory(spotifyTrackSearchResponseCodec);
+
+export type SpotifyTrackSearchResponse = P.GetType<typeof spotifyApiTrackSearchResponseCodec>

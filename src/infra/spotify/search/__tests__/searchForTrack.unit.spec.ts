@@ -1,9 +1,9 @@
 import { SpotifyError }                                                     from '@infra/spotify';
-import { SearchTrackDTO, TrackSearchResponse }                              from '@infra/spotify/search/types';
+import { SpotifyTrackSearchResponse }                                       from '@infra/spotify/search/types';
 import { makeErrorReponseFromRawResponse, makeOkayResponseFromRawResponse } from '@infra/spotify/testUtils';
 import { Either }                                                           from 'purify-ts';
 import SpotifyWebApi                                                        from 'spotify-web-api-node';
-import { searchForTrackWithClient }                                         from '../searchForTrack.root';
+import { searchForTrackWithClient, SearchTrackDTO }                         from '../searchForTrack.root';
 import nonEmptyResponse
                                                                             from './sampleResponses/trackSearch.nonEmptyResult.raw.json';
 
@@ -17,7 +17,7 @@ describe('searchForTrackWithClient', () => {
 
     const task = searchForTrackWithClient(mock_client);
 
-    let result: Either<SpotifyError, TrackSearchResponse>;
+    let result: Either<SpotifyError, SpotifyTrackSearchResponse>;
 
     const dto: SearchTrackDTO = {
         title: 'the title',

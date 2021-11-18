@@ -35,9 +35,11 @@ style.
 
 ## Example
 
-#### More examples can be found in the src/examples folder
+More examples can be found in the src/examples folder
 
 *This **will** break. Soon.*
+
+## Search for posts that have tracks and fetch the track locations from the Spotify API
 
 ```typescript
 
@@ -83,9 +85,7 @@ const main = P.EitherAsync(async ctx => {
         .run();
 });
 
-
 main.ifRight(resp => console.log(resp.extract())).run();
-
 
 //
 // [
@@ -173,64 +173,111 @@ main.ifRight(resp => console.log(resp.extract())).run();
 //             "id": "244ERJAd6yzW5JyjyuUkv5"
 //         }
 //     },
-//     {
-//         "reddit": {
-//             "trackInfo": {
-//                 "artist": "Shadow of Intent",
-//                 "title": "Intensified Genocide"
-//             },
-//             "submission": {
-//                 "id": "qvfd9s",
-//                 "title": "Shadow of Intent - Intensified Genocide",
-//                 "created_utc": 1637089591,
-//                 "permalink": "/r/Deathcore/comments/qvfd9s/shadow_of_intent_intensified_genocide/",
-//                 "score": 30,
-//                 "upvote_ratio": 0.94
-//             }
-//         },
-//         "track": {
-//             "artist": "Shadow of Intent",
-//             "title": "Intensified Genocide"
-//         },
-//         "spotify": {
-//             "item": {
-//                 "title": "Intensified Genocide",
-//                 "artist": "Shadow of Intent"
-//             },
-//             "uri": "spotify:track:7a3YsV6fIe8KJfaFRtPu4s",
-//             "id": "7a3YsV6fIe8KJfaFRtPu4s"
-//         }
-//     },
-//     {
-//         "reddit": {
-//             "trackInfo": {
-//                 "artist": "Distant",
-//                 "title": "Oedipism"
-//             },
-//             "submission": {
-//                 "id": "qtrfx6",
-//                 "title": "Distant - \"Oedipism\" one take cover by Alan Grnja",
-//                 "created_utc": 1636901749,
-//                 "permalink": "/r/Deathcore/comments/qtrfx6/distant_oedipism_one_take_cover_by_alan_grnja/",
-//                 "score": 16,
-//                 "upvote_ratio": 0.8
-//             }
-//         },
-//         "track": {
-//             "artist": "Distant",
-//             "title": "Oedipism"
-//         },
-//         "spotify": {
-//             "item": {
-//                 "title": "Oedipism",
-//                 "artist": "Distant"
-//             },
-//             "uri": "spotify:track:4nA4EL66VXDE6wQvtgWzB3",
-//             "id": "4nA4EL66VXDE6wQvtgWzB3"
-//         }
-//     },
-//     // ...
+//     ...
 // ]
+
+```
+
+## Spotify search services are memcached. Use them to search for multiple tracks
+
+```typescript
+
+/**
+ * 
+ * When calling out to track search service, any recently searched TrackInfo items
+ * will be cached in memory. Unless you're planing on doing your own rate limiting,
+ * use the searchService to offload from Spotify API so you arent pressed up against
+ * rate limit errors.
+ * 
+ */
+import { createSearchService, getAuthorizedClientCache } from '@/infra/spotify';
+import getSpotifyLogger                                  from '@infra/spotify/logger';
+import songMemoryCacheCacheIO                            from '@infra/spotify/search/trackCache';
+import { stringifyJsonUnsafe }                           from '@shared/fns/json';
+import { EitherAsync }                                   from 'purify-ts';
+
+
+const prog = EitherAsync<any, any>(async ctx => {
+
+    const client = await ctx.fromPromise(getAuthorizedClientCache.getLazy());
+
+    const searchService = createSearchService(client);
+
+    getSpotifyLogger().info('service started');
+
+    const songsDtos = [
+        {title: 'cowboy dan', artist: 'modest mouse'},
+        {title: 'decimation', artist: 'oh sleeper'},
+        {title: 'counting worms', artist: 'knocked loose'},
+    ];
+
+    const cache = songMemoryCacheCacheIO.getLazy(); // you should never need to interact with this directly
+
+    const initStats = cache.cache.getStats();
+
+    const task = EitherAsync(async ctx => {
+        const start = Date.now();
+        const result = await searchService.searchForManyTracks({tracks: songsDtos})
+            .map(resp => resp.length).run();
+        const stop = Date.now();
+
+        return {
+            results: result,
+            time: stop - start,
+        };
+    });
+
+    const result_01 = await task.run();
+    const result_02 = await task.run();
+    const result_03 = await task.run();
+
+    const results = {
+        run_01: result_01,
+        run_02: result_02,
+        run_03: result_03,
+        initStats,
+        stats: cache.cache.getStats()
+    };
+
+    console.log(stringifyJsonUnsafe(2)(results));
+
+});
+
+
+prog.run();
+
+/**
+ ...
+ {
+  "run_01": {
+    "results": 3,
+    "time": 1394
+  },
+  "run_02": {
+    "results": 3,
+    "time": 3
+  },
+  "run_03": {
+    "results": 3,
+    "time": 2
+  },
+  "initStats": {
+    "hits": 6,
+    "misses": 3,
+    "keys": 3,
+    "ksize": 111,
+    "vsize": 9897
+  },
+  "stats": {
+    "hits": 6,
+    "misses": 3,
+    "keys": 3,
+    "ksize": 111,
+    "vsize": 9897
+  }
+}
+
+ */
 
 ```
 

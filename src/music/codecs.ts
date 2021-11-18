@@ -1,5 +1,12 @@
-import { PostInfo } from '@/music/types';
-import * as P       from 'purify-ts';
+import { PostInfo, TrackInfo } from '@/music/types';
+import * as P                  from 'purify-ts';
+
+
+export type TrackInfoCodec = P.Codec<P.FromType<TrackInfo>>
+export const trackInfoCodec: TrackInfoCodec = P.Codec.interface({
+    title: P.string,
+    artist: P.string,
+});
 
 
 type PostInfoCodec = P.Codec<P.FromType<PostInfo>>;

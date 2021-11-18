@@ -1,8 +1,8 @@
-import CacheIO                       from '@fns/CacheIO';
-import { createMemoryCache, Hasher } from '@shared/memoryCache';
-import { SpotifyItem, TrackInfo }    from '@/music/types';
-import nodeCache                     from 'node-cache';
-import * as R                        from 'ramda';
+import { SpotifyItem, TrackInfo }                   from '@/music/types';
+import CacheIO                                      from '@fns/CacheIO';
+import { createMemoryCache, Hasher, KeyValueCache } from '@shared/memoryCache';
+import nodeCache                                    from 'node-cache';
+import * as R                                       from 'ramda';
 
 
 const trackHashTransforms = {
@@ -21,8 +21,9 @@ const hashTrack: Hasher<TrackInfo> = (track: TrackInfo): string => {
     )(track);
 };
 
+export type SpotifyTrackItemCache = KeyValueCache<TrackInfo, SpotifyItem<TrackInfo>[]>;
 
-export const songMemoryCacheCacheIO = CacheIO.of(() => {
+export const songMemoryCacheCacheIO: CacheIO<KeyValueCache<TrackInfo, SpotifyItem<TrackInfo>[]>> = CacheIO.of(() => {
     const songCache = new nodeCache({stdTTL: 60 * 180, maxKeys: 10000, forceString: true});
 
     return createMemoryCache<TrackInfo, SpotifyItem<TrackInfo>[]>(hashTrack)(songCache);
@@ -30,3 +31,4 @@ export const songMemoryCacheCacheIO = CacheIO.of(() => {
 
 
 export default songMemoryCacheCacheIO;
+

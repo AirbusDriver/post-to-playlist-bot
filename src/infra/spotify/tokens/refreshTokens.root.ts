@@ -1,23 +1,24 @@
-import { always, Either, EitherAsync, Left, liftEA, Right } from '@/shared/fns/purifyUtils';
-import { stringifyJsonSafe }                                from '@fns/json';
+import { Either, EitherAsync, liftEA }           from '@/shared/fns/purifyUtils';
+import { stringifyJsonSafe }                     from '@fns/json';
+import getLogger                                 from '@infra/spotify/logger';
 import {
     RefreshAccessTokenResponse,
     spotifyCodeGrantResponseCodec,
     spotifyRefreshTokenResponseCodec,
-}                                                           from '@infra/spotify/spotifyApiUtils';
-import { SaveFn }                                           from '@infra/spotify/tokens/saveTokensTask.root';
-import { AuthTokens }                                       from '@infra/spotify/tokens/types';
-import { Maybe }                                            from 'purify-ts';
-import SpotifyWebApi                                        from 'spotify-web-api-node';
+}                                                from '@infra/spotify/spotifyWebApiUtils';
+import { SaveFn }                                from '@infra/spotify/tokens/saveTokensTask.root';
+import { AuthTokens }                            from '@infra/spotify/tokens/types';
+import { Maybe }                                 from 'purify-ts';
+import * as R                                    from 'ramda';
+import SpotifyWebApi                             from 'spotify-web-api-node';
 import {
     SpotifyError,
     SpotifyErrorNames,
-}                                                           from '../errors';
-import * as R                                               from 'ramda';
+}                                                from '../errors';
 import { spotifyAuthEventEmitter as authEvents } from './authEvents';
-import getLogger                                 from '@infra/spotify/logger';
 
-const logger = getLogger().child({module: "refreshTokens"})
+
+const logger = getLogger().child({module: 'refreshTokens'});
 
 export const parseTokenResponseToDomainAuthTokens = (resp: unknown | RefreshAccessTokenResponse, refreshToken?: string): Either<string, AuthTokens> => {
     const toExpiresAt = (exp: number) => new Date(exp * 1000 + Date.now());

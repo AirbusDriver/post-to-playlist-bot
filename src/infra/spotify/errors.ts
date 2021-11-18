@@ -1,5 +1,5 @@
 import { RawError }                                        from '@/shared';
-import { SpotifyErrorResponse, spotifyErrorResponseCodec } from '@infra/spotify/spotifyApiUtils';
+import { SpotifyErrorResponse, spotifyErrorResponseCodec } from '@infra/spotify/spotifyWebApiUtils';
 import * as R                                              from 'ramda';
 
 

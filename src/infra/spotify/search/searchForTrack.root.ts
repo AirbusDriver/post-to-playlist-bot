@@ -1,72 +1,75 @@
-import { SpotifyItem, TrackInfo }                from '@/music/types';
-import { stringifyJsonUnsafe }                   from '@fns/json';
-import { SpotifyError, SpotifyErrorNames }       from '@infra/spotify';
-import { errorFactory }                          from '@infra/spotify/errors';
-import getSpotifyLogger                          from '@infra/spotify/logger';
-import {
-    spotifyApiTrackSearchResponseCodec,
-    TrackItem
-}                                                from '@infra/spotify/search/codecs';
-import {
-    QueryParams,
-    SearchForTrackCommandTask,
-    SearchTrackDTO,
-    TrackSearchResponse
-}                                                from '@infra/spotify/search/types';
-import { mapSpotifyErrorResponseToSpotifyError } from '@infra/spotify/spotifyApiUtils';
-import * as P                                    from 'purify-ts';
-import { EitherAsync, MaybeAsync }               from 'purify-ts';
-import R                                         from 'ramda';
-import SpotifyWebApi                             from 'spotify-web-api-node';
-import { songMemoryCacheCacheIO }                from './trackCache';
+import { SpotifyItem, TrackInfo }                               from '@/music/types';
+import { liftMA }                                               from '@fns';
+import { SpotifyError, SpotifyErrorNames }                      from '@infra/spotify';
+import { errorFactory }                                         from '@infra/spotify/errors';
+import getSpotifyLogger                                         from '@infra/spotify/logger';
+import { spotifyApiTrackSearchResponseCodec, SpotifyTrackItem } from '@infra/spotify/search/spotifyCodecs';
+import { SpotifyTrackSearchResponse }                           from '@infra/spotify/search/types';
+import { mapSpotifyErrorResponseToSpotifyError }                from '@infra/spotify/spotifyWebApiUtils';
+import * as P                                                   from 'purify-ts';
+import { EitherAsync, Maybe }                                   from 'purify-ts';
+import R                                                        from 'ramda';
+import SpotifyWebApi                                            from 'spotify-web-api-node';
+import { songMemoryCacheCacheIO, SpotifyTrackItemCache }        from './trackCache';
 
 
 const logger = getSpotifyLogger().child({module: 'spotify/search/searchForTrack'});
 
-const cache = songMemoryCacheCacheIO.getLazy();
+
+const cache: SpotifyTrackItemCache = songMemoryCacheCacheIO.getLazy();
+
+export type QueryParams = {
+    offset: number,
+    limit: number,
+}
 
 const defaultQueryParams: QueryParams = {
     limit: 5,
     offset: 0,
 };
 
+export type SearchTrackDTO = { track: TrackInfo, params?: QueryParams }
 
-export type DoSearchForTrackTask = (track: SearchTrackDTO, query?: QueryParams) => EitherAsync<SpotifyError, TrackSearchResponse>;
-
+const searchForTrackDtoCodec: P.Codec<P.FromType<SearchTrackDTO>> = P.Codec.interface({
+    track: P.Codec.interface({
+        title: P.string,
+        artist: P.string,
+    }),
+    params: P.optional(P.Codec.interface({
+        offset: P.number,
+        limit: P.number,
+    }))
+});
 
 /**
- * Dependency root
+ * Actual client search
  */
-export type SearchForTrackCommandContext = {
-    searchForTrackTaskFactory: (client: SpotifyWebApi) => DoSearchForTrackTask;
+export type DoSearchForTrackTask = (track: SearchTrackDTO, query?: QueryParams) => EitherAsync<SpotifyError, SpotifyTrackSearchResponse>;
+
+export type SearchForTrackCommandEnv = {
     client: SpotifyWebApi,
+    cache: SpotifyTrackItemCache | null
 }
 
 
 const trackDtoToSearchString = (dto: SearchTrackDTO): string => {
-    const {title, artist} = dto;
+    const {title, artist} = dto.track;
     return `track:${ title } artist:${ artist }`;
 };
 
 
-const searchForTrackDtoCodec: P.Codec<P.FromType<SearchTrackDTO>> = P.Codec.interface({
-    title: P.string,
-    artist: P.string,
-});
-
-
-export const searchForTrackWithClient = (client: SpotifyWebApi): DoSearchForTrackTask => (track, query) => {
+export const searchForTrackWithClient = (client: SpotifyWebApi): DoSearchForTrackTask => (dto: SearchTrackDTO) => {
     return EitherAsync(async ctx => {
 
-        const validatedDto = await ctx.liftEither(searchForTrackDtoCodec.decode(track).mapLeft(err => ({
+        const validatedDto = await ctx.liftEither(searchForTrackDtoCodec.decode(dto).mapLeft(err => ({
             message: err,
             name: SpotifyErrorNames.BAD_REQUEST,
             orig: P.parseError(err)
-        })));
+        }))) as SearchTrackDTO;
 
         const queryString = trackDtoToSearchString(validatedDto);
 
-        const queryParams = query || defaultQueryParams;
+        const queryParams = validatedDto.params || defaultQueryParams;
 
         const resp = await ctx.fromPromise(EitherAsync(() => client.searchTracks(queryString, queryParams))
             .ifLeft(logger.error)
@@ -81,7 +84,7 @@ export const searchForTrackWithClient = (client: SpotifyWebApi): DoSearchForTrac
                 searchString: queryString,
                 params: queryParams
             },
-            result: results.body.tracks.items[0]
+            result: results.body.tracks.items
         });
 
         return results;
@@ -89,7 +92,7 @@ export const searchForTrackWithClient = (client: SpotifyWebApi): DoSearchForTrac
 };
 
 
-export const itemToTrackInfo: (item: TrackItem) => SpotifyItem<TrackInfo> = item => ({
+export const itemToTrackInfo: (item: SpotifyTrackItem) => SpotifyItem<TrackInfo> = item => ({
     item: {
         title: item.name,
         artist: item.artists[0].name,
@@ -99,27 +102,33 @@ export const itemToTrackInfo: (item: TrackItem) => SpotifyItem<TrackInfo> = item
 });
 
 
-export const responseToTrackInfo: (resp: TrackSearchResponse) => SpotifyItem<TrackInfo>[] = R.pipe(
-    (x: TrackSearchResponse) => x.body.tracks.items,
+export const responseToTrackInfo: (resp: SpotifyTrackSearchResponse) => SpotifyItem<TrackInfo>[] = R.pipe(
+    (x: SpotifyTrackSearchResponse) => x.body.tracks.items,
     R.map(itemToTrackInfo)
 );
 
 
-type SearchForTrackCommandRoot = (fnCtx: SearchForTrackCommandContext) => SearchForTrackCommandTask;
+export type SearchForTrackCommandResponse = EitherAsync<SpotifyError, SpotifyItem<TrackInfo>[]>
 
+export type SearchForTrackCommandTask = (track: SearchTrackDTO, query?: QueryParams) => SearchForTrackCommandResponse
+
+type SearchForTrackCommandRoot = (fnCtx: SearchForTrackCommandEnv) => SearchForTrackCommandTask;
 
 export const searchForTrackCommandRoot: SearchForTrackCommandRoot =
-    fnCtx => (track, query) => EitherAsync(async ctx => {
+    fnCtx => (dto) => EitherAsync(async ctx => {
 
-        return ctx.fromPromise(MaybeAsync.liftMaybe(cache.get(track))
+        const respPromise = liftMA(Maybe.fromNullable(fnCtx.cache))
+            .chain(cache => liftMA(cache.get(dto.track)))
             .ifJust(() => logger.debug('returned from cache', {
-                track
+                track: dto.track
             }))
             .toEitherAsync(null)
-            .chainLeft(() => fnCtx.searchForTrackTaskFactory(fnCtx.client)(track, query)
+            .chainLeft(() => searchForTrackWithClient(fnCtx.client)(dto)
                 .map(responseToTrackInfo))
-            .ifRight(resp => cache.set(track, resp))
-            .run());
+            .ifRight(resp => cache.set(dto.track, resp))
+            .run();
+
+        return ctx.fromPromise(respPromise);
     });
 
-export { SearchForTrackCommandTask };
+
