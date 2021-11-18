@@ -30,7 +30,7 @@ const prog = EitherAsync<any, any>(async ctx => {
 
     const cache = songMemoryCacheCacheIO.getLazy(); // you should never need to interact with this directly
 
-    const initStats = cache.cache.getStats();
+    const initStats = cache._cache.getStats();
 
     const task = EitherAsync(async ctx => {
         const start = Date.now();
@@ -53,7 +53,7 @@ const prog = EitherAsync<any, any>(async ctx => {
         run_02: result_02,
         run_03: result_03,
         initStats,
-        stats: cache.cache.getStats()
+        stats: cache._cache.getStats()
     };
 
     console.log(stringifyJsonUnsafe(2)(results));

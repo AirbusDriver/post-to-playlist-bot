@@ -47,7 +47,7 @@ const searchForTrackDtoCodec: P.Codec<P.FromType<SearchTrackDTO>> = P.Codec.inte
 export type DoSearchForTrackTask = (track: SearchTrackDTO, query?: QueryParams) => EitherAsync<SpotifyError, SpotifyTrackSearchResponse>;
 
 export type SearchForTrackCommandEnv = {
-    client: SpotifyWebApi,
+    search: DoSearchForTrackTask,
     cache: SpotifyTrackItemCache | null
 }
 
@@ -122,10 +122,10 @@ export const searchForTrackCommandRoot: SearchForTrackCommandRoot =
             .ifJust(() => logger.debug('returned from cache', {
                 track: dto.track
             }))
-            .toEitherAsync(null)
-            .chainLeft(() => searchForTrackWithClient(fnCtx.client)(dto)
-                .map(responseToTrackInfo))
-            .ifRight(resp => cache.set(dto.track, resp))
+            .toEitherAsync('noooope')
+            .chainLeft(() => fnCtx.search(dto)
+                .map(responseToTrackInfo)
+                .ifRight(resp => fnCtx.cache?.set(dto.track, resp)))
             .run();
 
         return ctx.fromPromise(respPromise);

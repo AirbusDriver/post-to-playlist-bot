@@ -1,11 +1,13 @@
-import nodeCache from 'node-cache';
-import * as P    from 'purify-ts';
-import * as R    from 'ramda';
+import { Logger } from '@shared/logger';
+import nodeCache  from 'node-cache';
+import * as P     from 'purify-ts';
+import * as R     from 'ramda';
 
 
 export type KeyValueCache<K, T> = Readonly<{
-    cache: nodeCache;
-    itemHasher: (item: K) => string;
+    _cache: nodeCache;
+    _itemHasher: (item: K) => string;
+    _logger?: Logger;
     get(hashable: K): P.Maybe<T>;
     getMany(hashable: K[]): P.Maybe<T>[]
     set(hashable: K, val: T): P.Either<Error, T>;
@@ -14,44 +16,43 @@ export type KeyValueCache<K, T> = Readonly<{
 
 export type Hasher<T> = (item: T) => string;
 
-const getItemFromCache = <K, T>(hasher: Hasher<K>) => (cache: nodeCache) => (hashable: K): P.Maybe<T> => {
+const getItemFromCache = <K, T>(hasher: Hasher<K>) => (cache: nodeCache, logger?: Logger) => (hashable: K): P.Maybe<T> => {
     return P.Either.encase(() => hasher(hashable))
-        .ifLeft(_ => console.log(`could not hash item`))
-        .ifLeft(console.error)
+        .ifLeft(err => logger?.error(`could not hash item`, {item: hashable, error: err}))
         .toMaybe()
         .chainNullable(key => cache.get<T>(key));
 };
 
-const getManyItemsFromCache = <K, T>(hasher: Hasher<K>) => (cache: nodeCache) => (hashables: K[]): P.Maybe<T>[] => {
-    return hashables.map(item => getItemFromCache<K, T>(hasher)(cache)(item));
+const getManyItemsFromCache = <K, T>(hasher: Hasher<K>) => (cache: nodeCache, logger?: Logger) => (hashables: K[]): P.Maybe<T>[] => {
+    return hashables.map(item => getItemFromCache<K, T>(hasher)(cache, logger)(item));
 };
 
-const setItemToCache = <K, T>(hasher: Hasher<K>) => (cache: nodeCache) => (hashable: K, val: T): P.Either<Error, T> => {
+const setItemToCache = <K, T>(hasher: Hasher<K>) => (cache: nodeCache, logger?: Logger) => (hashable: K, val: T): P.Either<Error, T> => {
     return P.Either.encase(() => hasher(hashable))
         .map(R.pipe(
             (key: string) => cache.set(key, val),
             R.ifElse(
                 R.equals(true),
-                (k) => console.debug(`setItemToCache: ${ k } success`),
-                (k) => console.error(`setItemToCache: ${ k } failed`)
+                (k) => logger?.debug(`setItemToCache: success`, {item: hashable}),
+                (k) => logger?.error(`setItemToCache: failed`, {item: hashable})
             )
         ))
         .map(R.always(val))
-        .ifLeft(_ => console.error(`could not hash item`))
-        .ifLeft(console.error);
+        .ifLeft(err => logger?.error(`setItemToCache: failed`, {item: hashable, error: err}));
 };
 
-const setManyItemsToCache = <K, T>(hasher: Hasher<K>) => (cache: nodeCache) => (entries: [ K, T ][]): P.Either<Error, T>[] => {
+const setManyItemsToCache = <K, T>(hasher: Hasher<K>) => (cache: nodeCache, logger?: Logger) => (entries: [ K, T ][]): P.Either<Error, T>[] => {
     return entries.map(([ k, v ]) => setItemToCache<K, T>(hasher)(cache)(k, v));
 };
 
-export const createMemoryCache = <K, T>(itemHasher: Hasher<K>) => (cache: nodeCache): KeyValueCache<K, T> => {
+export const createMemoryCache = <K, T>(itemHasher: Hasher<K>) => (cache: nodeCache, logger?: Logger): KeyValueCache<K, T> => {
+
     return {
-        cache,
-        itemHasher,
-        get: getItemFromCache<K, T>(itemHasher)(cache),
-        set: setItemToCache<K, T>(itemHasher)(cache),
-        setMany: setManyItemsToCache<K, T>(itemHasher)(cache),
-        getMany: getManyItemsFromCache<K, T>(itemHasher)(cache),
+        _cache: cache,
+        _itemHasher: itemHasher,
+        get: getItemFromCache<K, T>(itemHasher)(cache, logger),
+        set: setItemToCache<K, T>(itemHasher)(cache, logger),
+        setMany: setManyItemsToCache<K, T>(itemHasher)(cache, logger),
+        getMany: getManyItemsFromCache<K, T>(itemHasher)(cache, logger),
     };
 };

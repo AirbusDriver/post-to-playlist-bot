@@ -1,15 +1,15 @@
-import { trackInfoCodec }             from '@/music/codecs';
-import { SpotifyItem, TrackInfo }     from '@/music/types';
-import { runEAsyncsWithDelaySeq }     from '@fns';
-import { perSecond }                  from '@fns/delay';
-import { SpotifyError }               from '@infra/spotify';
-import { errorFactory }               from '@infra/spotify/errors';
-import getSpotifyLogger               from '@infra/spotify/logger';
-import * as P                         from 'purify-ts';
-import * as R                         from 'ramda';
-import SpotifyWebApi                  from 'spotify-web-api-node';
-import { searchForTrackCommandRoot, } from './searchForTrack.root';
-import { SpotifyTrackItemCache }      from './trackCache';
+import { trackInfoCodec }                                      from '@/music/codecs';
+import { SpotifyItem, TrackInfo }                              from '@/music/types';
+import { runEAsyncsWithDelaySeq }                              from '@fns';
+import { perSecond }                                           from '@fns/delay';
+import { SpotifyError }                                        from '@infra/spotify';
+import { errorFactory }                                        from '@infra/spotify/errors';
+import getSpotifyLogger                                        from '@infra/spotify/logger';
+import * as P                                                  from 'purify-ts';
+import * as R                                                  from 'ramda';
+import SpotifyWebApi                                           from 'spotify-web-api-node';
+import { searchForTrackCommandRoot, searchForTrackWithClient } from './searchForTrack.root';
+import { SpotifyTrackItemCache }                               from './trackCache';
 
 
 const logger = getSpotifyLogger().child({module: 'spotify/search/searchForManyTracks'});
@@ -52,7 +52,10 @@ export const searchForManyTracksTaskRoot = (env: SearchForManyTracksTaskEnv): Se
 
         const toGetFromClient = cacheResults.filter(tup => tup.snd().isNothing()) as unknown as P.Tuple<TrackInfo, null>[];
 
-        const clientFetcher = searchForTrackCommandRoot({client: env.client, cache: env.cache});
+        const clientFetcher = searchForTrackCommandRoot({
+            search: searchForTrackWithClient(env.client),
+            cache: env.cache
+        });
 
         const tasks = toGetFromClient.map(tup =>
             clientFetcher({track: tup.fst()})
@@ -62,7 +65,7 @@ export const searchForManyTracksTaskRoot = (env: SearchForManyTracksTaskEnv): Se
 
         const cacheRights = cacheResults
             .map(t => t.map(mb => mb.extractNullable()))
-            .filter(t => R.complement(R.isNil)(t)) as P.Tuple<TrackInfo, SpotifyItem<TrackInfo>[]>[];
+            .filter(t => R.complement(R.isNil)(t.snd())) as P.Tuple<TrackInfo, SpotifyItem<TrackInfo>[]>[];
 
         const clientRights = clientResults.rights;
 
