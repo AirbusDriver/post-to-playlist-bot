@@ -1,18 +1,18 @@
-import { trackInfoCodec }                                      from '@/music/codecs';
-import { SpotifyItem, TrackInfo }                              from '@/music/types';
-import { runEAsyncsWithDelaySeq }                              from '@fns';
-import { perSecond }                                           from '@fns/delay';
-import { SpotifyError }                                        from '@infra/spotify';
-import { errorFactory }                                        from '@infra/spotify/errors';
-import getSpotifyLogger                                        from '@infra/spotify/logger';
-import * as P                                                  from 'purify-ts';
-import * as R                                                  from 'ramda';
-import SpotifyWebApi                                           from 'spotify-web-api-node';
-import { searchForTrackCommandRoot, searchForTrackWithClient } from './searchForTrack.root';
-import { SpotifyTrackItemCache }                               from './trackCache';
+import { trackInfoCodec }                                      from "@/music/codecs";
+import { SpotifyItem, TrackInfo }                              from "@/music/types";
+import { runEAsyncsWithDelaySeq }                              from "@fns";
+import { perSecond }                                           from "@fns/delay";
+import { SpotifyError }                                        from "@infra/spotify";
+import { errorFactory }                                        from "@infra/spotify/errors";
+import getSpotifyLogger                                        from "@infra/spotify/logger";
+import * as P                                                  from "purify-ts";
+import * as R                                                  from "ramda";
+import SpotifyWebApi                                           from "spotify-web-api-node";
+import { searchForTrackCommandRoot, searchForTrackWithClient } from "./searchForTrack.root";
+import { SpotifyTrackItemCache }                               from "./trackCache";
 
 
-const logger = getSpotifyLogger().child({module: 'spotify/search/searchForManyTracks'});
+const logger = getSpotifyLogger().child({module: "spotify/search/searchForManyTracks"});
 
 const DELAY = perSecond(6);
 

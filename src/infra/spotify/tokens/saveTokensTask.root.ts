@@ -1,10 +1,10 @@
-import { writeToFileSyncSafe }                        from '@fns/fileIO';
-import { stringifyJsonSafe }                          from '@fns/json';
-import { getSpotifyConfigSafe, GetSpotifyConfigSafe } from '@infra/spotify/config';
-import { errorFactory, SpotifyError }                 from '@infra/spotify/errors';
-import { encodeAuthTokensDomainSafe }                 from '@infra/spotify/tokens/codecs';
-import { AuthTokens, SaveTokensTask }                 from '@infra/spotify/tokens/types';
-import { Either, EitherAsync }                        from 'purify-ts';
+import { writeToFileSyncSafe }                        from "@fns/fileIO";
+import { stringifyJsonSafe }                          from "@fns/json";
+import { getSpotifyConfigSafe, GetSpotifyConfigSafe } from "@infra/spotify/config";
+import { errorFactory, SpotifyError }                 from "@infra/spotify/errors";
+import { encodeAuthTokensDomainSafe }                 from "@infra/spotify/tokens/codecs";
+import { AuthTokens, SaveTokensTask }                 from "@infra/spotify/tokens/types";
+import { Either, EitherAsync }                        from "purify-ts";
 
 
 export type SaveFn = (tokens: AuthTokens) => EitherAsync<SpotifyError, void>

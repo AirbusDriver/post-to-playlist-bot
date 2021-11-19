@@ -50,20 +50,20 @@ const dtoListCodec: P.Codec<P.FromType<WithoutTimeDto>> = P.Codec.interface({
 
 type SearchSongPostsDtoCodec = P.Codec<P.FromType<SearchSongPostsDto>>
 export const searchSongPostsDtoCodec: SearchSongPostsDtoCodec = P.intersect(P.Codec.interface({
-        subreddit: P.string,
-        limit: P.Codec.custom<number>(
-            {
-                decode: input => R.cond([
-                    [ R.pipe(parseInt, isNaN), R.always(P.Left('not a number')) ],
-                    [ R.flip(R.gte)(150), R.always(P.Left('number must be between 0 - 150')) ],
-                    [ R.flip(R.lt)(1), R.always(P.Left('number must be greater than 0')) ],
-                    [ R.T, R.pipe(parseInt, Right) ]
-                ])(input),
-                encode: R.identity
-            }
-        )
-    }),
-    P.oneOf([ dtoListCodec, dtoTimeCodec ]));
+    subreddit: P.string,
+    limit: P.Codec.custom<number>(
+        {
+            decode: input => R.cond([
+                [ R.pipe(parseInt, isNaN), R.always(P.Left('not a number')) ],
+                [ R.flip(R.gte)(150), R.always(P.Left('number must be between 0 - 150')) ],
+                [ R.flip(R.lt)(1), R.always(P.Left('number must be greater than 0')) ],
+                [ R.T, R.pipe(parseInt, Right) ]
+            ])(input),
+            encode: R.identity
+        }
+    )
+}),
+P.oneOf([ dtoListCodec, dtoTimeCodec ]));
 
 
 export enum SearchSongPostsErrorReasons {
@@ -114,7 +114,7 @@ export const searchForSongPostsRoot = (env: Env): SearchForSongPostsTask => {
                 return acc;
             }
 
-            logger.debug(`top of recurse search`, {
+            logger.debug('top of recurse search', {
                 acc: {
                     seen: acc.length,
                     remDepth: maxDepth,
@@ -129,7 +129,7 @@ export const searchForSongPostsRoot = (env: Env): SearchForSongPostsTask => {
                 .map(last => last[0].submission.id)
                 .map<GetSongPostsDto>(id => ({...defaultsDto, opts: {after: id, limit: chunk}}))
                 .orDefault(defaultsDto);
-            logger.debug(`calling getSongPosts with...`, {data: nextGetSongsDto});
+            logger.debug('calling getSongPosts with...', {data: nextGetSongsDto});
 
             const deDupedAccum = R.uniqBy(([ _, spot ]) => spot != null, acc);
 
@@ -139,7 +139,7 @@ export const searchForSongPostsRoot = (env: Env): SearchForSongPostsTask => {
                     message: 'could not reach song post search service',
                     orig: err.orig
                 }))
-                .ifLeft(_ => logger.debug(`getSongPosts service failed`))
+                .ifLeft(_ => logger.debug('getSongPosts service failed'))
                 .ifLeft(logger.error)
                 .run());
 
@@ -183,7 +183,7 @@ export const searchForSongPostsRoot = (env: Env): SearchForSongPostsTask => {
 
 
             logger.debug(`found ${ iterationResults.length } new results`);
-            logger.debug(`last iteration result item id`, {item: iterationResults[iterationResults.length - 1]});
+            logger.debug('last iteration result item id', {item: iterationResults[iterationResults.length - 1]});
 
 
             return await recurse(maxDepth - chunk, chunk, limit, initialDto, [ ...deDupedAccum, ...iterationResults ]);

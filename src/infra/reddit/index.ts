@@ -1,2 +1,2 @@
-export { getClient } from './getClient';
+export { getClient } from "./getClient";
 

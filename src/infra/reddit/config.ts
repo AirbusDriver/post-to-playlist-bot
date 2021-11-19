@@ -1,26 +1,26 @@
-import { remapKeys, safeGetEnvIO }         from '@fns/envIO';
-import { RedditConfig }                    from '@infra/reddit/types';
-import { Either, Right }                   from 'purify-ts';
-import * as R                              from 'ramda';
-import { redditConfigCodec }               from './codecs';
-import { RedditError, redditErrorFactory } from './errors';
+import { remapKeys, safeGetEnvIO }         from "@fns/envIO";
+import { RedditConfig }                    from "@infra/reddit/types";
+import { Either, Right }                   from "purify-ts";
+import * as R                              from "ramda";
+import { redditConfigCodec }               from "./codecs";
+import { RedditError, redditErrorFactory } from "./errors";
 
 
 const defaults: Partial<RedditConfig> = {
-    userAgent: 'BleghBot: a metalcore playlist maker',
+    userAgent: "BleghBot: a metalcore playlist maker",
 };
 
 const envValsToPropMap: Map<string, keyof RedditConfig> = new Map([
-    [ 'REDDIT_SECRET', 'clientSecret' ],
-    [ 'REDDIT_CLIENT_ID', 'clientId' ],
-    [ 'REDDIT_USERNAME', 'username' ],
-    [ 'REDDIT_PASSWORD', 'password' ]
+    [ "REDDIT_SECRET", "clientSecret" ],
+    [ "REDDIT_CLIENT_ID", "clientId" ],
+    [ "REDDIT_USERNAME", "username" ],
+    [ "REDDIT_PASSWORD", "password" ]
 ]);
 
 const mapEnvToConfigKeys = remapKeys(envValsToPropMap);
 
 const getSpotifyEnv: () => Either<RedditError, Partial<RedditConfig>> = () => {
-    return safeGetEnvIO().toEither(redditErrorFactory.config('could not retrieve env settings'))
+    return safeGetEnvIO().toEither(redditErrorFactory.config("could not retrieve env settings"))
         .map(mapEnvToConfigKeys);
 };
 

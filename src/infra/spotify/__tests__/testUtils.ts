@@ -8,12 +8,12 @@ export const makeOkayResponseFromRawResponse = <T>(response: T) => ({
     body: response,
     statusCode: 200,
     headers: {
-        some: 'header'
+        some: "header"
     }
 });
 
 
-export const makeErrorReponseFromRawResponse = <T>(msg = 'some error message', statusCode = 401) => ({
+export const makeErrorReponseFromRawResponse = <T>(msg = "some error message", statusCode = 401) => ({
     body: {
         error: {
             message: msg,
@@ -23,7 +23,7 @@ export const makeErrorReponseFromRawResponse = <T>(msg = 'some error message', s
     message: msg,
     statusCode: statusCode,
     headers: {
-        some: 'header'
+        some: "header"
     }
 });
 

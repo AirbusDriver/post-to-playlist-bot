@@ -40,11 +40,11 @@ const toCode = <T extends ApplicationErrorNames>(s: T) => {
     let out: number;
 
     switch (s) {
-        case ApplicationErrorNames.BAD_REQUEST:
-            out = 400;
-            break;
-        default:
-            out = 500;
+    case ApplicationErrorNames.BAD_REQUEST:
+        out = 400;
+        break;
+    default:
+        out = 500;
     }
     return out;
 

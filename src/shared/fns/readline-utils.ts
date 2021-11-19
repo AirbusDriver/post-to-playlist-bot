@@ -1,8 +1,8 @@
-import { EitherAsync, fromPromiseEA, Just, Left, liftEA, liftMA, Maybe, Nothing, Right } from '@fns/purifyUtils';
-import { Either, MaybeAsync }                                                            from 'purify-ts';
-import * as P                                                                            from 'purify-ts';
-import readline, { Interface }                                                           from 'readline';
-import * as R                                                                            from 'ramda';
+import { EitherAsync, fromPromiseEA, Just, Left, liftEA, liftMA, Maybe, Nothing, Right } from "@fns/purifyUtils";
+import { Either, MaybeAsync }                                                            from "purify-ts";
+import * as P                                                                            from "purify-ts";
+import readline, { Interface }                                                           from "readline";
+import * as R                                                                            from "ramda";
 
 
 export { Interface };
@@ -18,7 +18,7 @@ export type WithReadlineInterfaceTaskIO<T = void> = (iface: Interface) => T;
  * @param {string} trailing the string to end the line with. Defaults to new line
  * @returns {(iface) => void} - a function that takes an interface
  */
-export const printIO: (s: string, trailing?: string) => WithReadlineInterfaceTaskIO = (s, trailing = '\n') => iface => {
+export const printIO: (s: string, trailing?: string) => WithReadlineInterfaceTaskIO = (s, trailing = "\n") => iface => {
     iface.write(`${ s }${ trailing }`);
 };
 

@@ -8,16 +8,16 @@ import * as R                     from 'ramda';
 import Snoowrap                   from 'snoowrap';
 
 
-const metaRegex = /^(?:[\p{Ps}\p{Po}]+\s*\b[\w\s\d,\/-]+\b[\p{Pe}\p{Po}]+)*\s*/u;
+const metaRegex = /^(?:[\p{Ps}\p{Po}]+\s*\b[\w\s\d,/-]+\b[\p{Pe}\p{Po}]+)*\s*/u;
 
 export const trackRegexs = [
     metaRegex, // meta
     /[\p{Ps}\p{Po}\p{Pi}]?/u,
-    /(?<artist>\b[\w\s\/.]+\b)/, // Artist
+    /(?<artist>\b[\w\s/.]+\b)/, // Artist
     /[\p{Pe}\p{Po}\p{Pf}]?/u,
     /\s*\p{Pd}+\s*/u, // gap dash gap
     /[\p{Ps}\p{Po}\p{Pi}]?/u,
-    /(?<track>\b[\w\s\/.]+\b)/, // Track
+    /(?<track>\b[\w\s/.]+\b)/, // Track
     /[\p{Pe}\p{Po}\p{Pf}]?/u,
     /.*$/u, // end
 ];

@@ -1,15 +1,15 @@
-import { getClient }                                    from '@/infra/reddit';
-import { searchSongPostJsonController }                 from '@/music/searchForSongPosts.controller.json.express';
-import { searchForSongPostsRoot }                       from '@/music/searchForSongPosts.root';
-import { searchForTrackInfoControllerJsonExpress }      from '@/music/searchForTrackInfo.controller.json.express';
-import { getSongPostsFromSubredditTaskRoot }            from '@infra/reddit/songPosts';
-import { createSearchService, getAuthorizedClientTask } from '@infra/spotify';
-import getRootLogger                                    from '@shared/logger';
-import { json, Router }                                 from 'express';
-import { EitherAsync }                                  from 'purify-ts';
+import { getClient }                                    from "@/infra/reddit";
+import { searchSongPostJsonController }                 from "@/music/searchForSongPosts.controller.json.express";
+import { searchForSongPostsRoot }                       from "@/music/searchForSongPosts.root";
+import { searchForTrackInfoControllerJsonExpress }      from "@/music/searchForTrackInfo.controller.json.express";
+import { getSongPostsFromSubredditTaskRoot }            from "@infra/reddit/songPosts";
+import { createSearchService, getAuthorizedClientTask } from "@infra/spotify";
+import getRootLogger                                    from "@shared/logger";
+import { json, Router }                                 from "express";
+import { EitherAsync }                                  from "purify-ts";
 
 
-const logger = getRootLogger().child({module: 'music-api'});
+const logger = getRootLogger().child({module: "music-api"});
 
 
 export const musicRouterFactoryTask = EitherAsync<any, Router>(async ctx => {
@@ -36,7 +36,7 @@ export const musicRouterFactoryTask = EitherAsync<any, Router>(async ctx => {
 
     // Routes
 
-    router.get('/song-posts', async (req, res) => {
+    router.get("/song-posts", async (req, res) => {
 
         await searchForSongPostsController(req)
             .ifRight(resp => res.json(resp))
@@ -45,7 +45,7 @@ export const musicRouterFactoryTask = EitherAsync<any, Router>(async ctx => {
             .run();
     });
 
-    router.post('/search/tracks', async (req, res) => {
+    router.post("/search/tracks", async (req, res) => {
 
         logger.info(req.body);
 

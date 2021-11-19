@@ -1,5 +1,5 @@
-import { SpotifyError } from '@infra/spotify/errors';
-import { EitherAsync }  from 'purify-ts';
+import { SpotifyError } from "@infra/spotify/errors";
+import { EitherAsync }  from "purify-ts";
 
 
 /** Domain representation of the relevant information needed to make authorized requests */

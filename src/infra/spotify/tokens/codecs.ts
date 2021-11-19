@@ -1,6 +1,6 @@
-import { SpotifyError, SpotifyErrorNames } from '@infra/spotify/errors';
-import { AuthTokens, AuthTokensDto }       from '@infra/spotify/tokens/types';
-import * as P                              from 'purify-ts';
+import { SpotifyError, SpotifyErrorNames } from "@infra/spotify/errors";
+import { AuthTokens, AuthTokensDto }       from "@infra/spotify/tokens/types";
+import * as P                              from "purify-ts";
 
 
 export const authTokensDomainCodec: P.Codec<P.FromType<AuthTokens>> = P.Codec.interface({

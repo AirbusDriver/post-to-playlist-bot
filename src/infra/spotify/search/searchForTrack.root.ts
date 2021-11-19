@@ -1,19 +1,19 @@
-import { SpotifyItem, TrackInfo }                               from '@/music/types';
-import { liftMA }                                               from '@fns';
-import { SpotifyError, SpotifyErrorNames }                      from '@infra/spotify';
-import { errorFactory }                                         from '@infra/spotify/errors';
-import getSpotifyLogger                                         from '@infra/spotify/logger';
-import { spotifyApiTrackSearchResponseCodec, SpotifyTrackItem } from '@infra/spotify/search/spotifyCodecs';
-import { SpotifyTrackSearchResponse }                           from '@infra/spotify/search/types';
-import { mapSpotifyErrorResponseToSpotifyError }                from '@infra/spotify/spotifyWebApiUtils';
-import * as P                                                   from 'purify-ts';
-import { EitherAsync, Maybe }                                   from 'purify-ts';
-import R                                                        from 'ramda';
-import SpotifyWebApi                                            from 'spotify-web-api-node';
-import { songMemoryCacheCacheIO, SpotifyTrackItemCache }        from './trackCache';
+import { SpotifyItem, TrackInfo }                               from "@/music/types";
+import { liftMA }                                               from "@fns";
+import { SpotifyError, SpotifyErrorNames }                      from "@infra/spotify";
+import { errorFactory }                                         from "@infra/spotify/errors";
+import getSpotifyLogger                                         from "@infra/spotify/logger";
+import { spotifyApiTrackSearchResponseCodec, SpotifyTrackItem } from "@infra/spotify/search/spotifyCodecs";
+import { SpotifyTrackSearchResponse }                           from "@infra/spotify/search/types";
+import { mapSpotifyErrorResponseToSpotifyError }                from "@infra/spotify/spotifyWebApiUtils";
+import * as P                                                   from "purify-ts";
+import { EitherAsync, Maybe }                                   from "purify-ts";
+import R                                                        from "ramda";
+import SpotifyWebApi                                            from "spotify-web-api-node";
+import { songMemoryCacheCacheIO, SpotifyTrackItemCache }        from "./trackCache";
 
 
-const logger = getSpotifyLogger().child({module: 'spotify/search/searchForTrack'});
+const logger = getSpotifyLogger().child({module: "spotify/search/searchForTrack"});
 
 
 const cache: SpotifyTrackItemCache = songMemoryCacheCacheIO.getLazy();
@@ -78,7 +78,7 @@ export const searchForTrackWithClient = (client: SpotifyWebApi): DoSearchForTrac
         const results = await ctx.liftEither(spotifyApiTrackSearchResponseCodec.decode(resp)
             .mapLeft<SpotifyError>(errorFactory.unknown));
 
-        logger.debug('spotify track search results', {
+        logger.debug("spotify track search results", {
             input: {
                 dto: validatedDto,
                 searchString: queryString,
@@ -119,10 +119,10 @@ export const searchForTrackCommandRoot: SearchForTrackCommandRoot =
 
         const respPromise = liftMA(Maybe.fromNullable(fnCtx.cache))
             .chain(cache => liftMA(cache.get(dto.track)))
-            .ifJust(() => logger.debug('returned from cache', {
+            .ifJust(() => logger.debug("returned from cache", {
                 track: dto.track
             }))
-            .toEitherAsync('noooope')
+            .toEitherAsync("noooope")
             .chainLeft(() => fnCtx.search(dto)
                 .map(responseToTrackInfo)
                 .ifRight(resp => fnCtx.cache?.set(dto.track, resp)))

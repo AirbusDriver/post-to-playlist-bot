@@ -1,21 +1,21 @@
 // noinspection JSValidateJSDoc
 
-import events                  from 'events';
-import { Either, Left, Right } from 'purify-ts';
+import events                  from "events";
+import { Either, Left, Right } from "purify-ts";
 
 
 enum CacheEvents {
-    CLEARED = 'CLEARED',
-    SET = 'SET',
-    RUN = 'RUN',
-    GET_CACHE = 'GET_CACHE'
+    CLEARED = "CLEARED",
+    SET = "SET",
+    RUN = "RUN",
+    GET_CACHE = "GET_CACHE"
 }
 
 
-const CACHE_EVENT = Symbol('CACHE_EVENT');
+const CACHE_EVENT = Symbol("CACHE_EVENT");
 export type CacheEvent<T> = {
     event: CacheEvents,
-    val: T | 'not ran',
+    val: T | "not ran",
     descr: string;
 }
 
@@ -47,7 +47,7 @@ export class CacheIO<T> {
 
     // private _clearIfs: ((x: T) => boolean)[] = [];
 
-    private constructor(fn: () => T, descr = 'CacheIO') {
+    private constructor(fn: () => T, descr = "CacheIO") {
         this.__fn = fn;
         this.description = descr;
     }
@@ -177,7 +177,7 @@ export class CacheIO<T> {
      */
     startClearInterval(mili: number): Either<string, ReturnType<typeof setInterval>> {
         if (mili < 100) {
-            return Left('must be a positive number >= 100');
+            return Left("must be a positive number >= 100");
         }
         if (this._interval != null) {
             this.stopClearInterval();
@@ -218,9 +218,9 @@ export class CacheIO<T> {
      * @returns {CacheEvent<T>['val']}
      * @private
      */
-    private _inspectVal(): CacheEvent<T>['val'] {
+    private _inspectVal(): CacheEvent<T>["val"] {
         if (this.hasRun()) return this._value as T;
-        return 'not ran';
+        return "not ran";
     }
 
 }

@@ -1,10 +1,10 @@
-import CacheIO           from '@fns/CacheIO';
-import { SpotifyConfig } from '@infra/spotify/config/types';
-import { Either }                       from 'purify-ts';
-import { errorFactory, SpotifyError }   from '../errors';
-import { configCodec }                  from './codec';
-import { getSettings, GetSettingsSafe } from './settings';
-import getSpotifyLogger, { Logger }     from '@infra/spotify/logger';
+import CacheIO           from "@fns/CacheIO";
+import { SpotifyConfig } from "@infra/spotify/config/types";
+import { Either }                       from "purify-ts";
+import { errorFactory, SpotifyError }   from "../errors";
+import { configCodec }                  from "./codec";
+import { getSettings, GetSettingsSafe } from "./settings";
+import getSpotifyLogger, { Logger }     from "@infra/spotify/logger";
 
 const logger = getSpotifyLogger()
 
@@ -21,10 +21,10 @@ export const getSpotifyConfigSafeRoot: GetSpotifyConfigSafeRoot = logger => getS
     return getSettingsSafe()
         .chain(data => configCodec.decode(data)
             .mapLeft((err) => errorFactory.config(err))
-            .ifLeft(s => logger.debug(`failed to decode Spotify config`))
+            .ifLeft(s => logger.debug("failed to decode Spotify config"))
             .ifLeft(logger.debug),
         )
-        .ifRight(_ => logger.debug(`config retrieved with value... `))
+        .ifRight(_ => logger.debug("config retrieved with value... "))
         .ifRight(logger.debug);
 };
 

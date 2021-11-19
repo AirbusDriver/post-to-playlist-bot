@@ -1,5 +1,5 @@
-import { existsSync, promises, readFileSync as fsRead, writeFileSync } from 'fs';
-import * as P                                                          from 'purify-ts';
+import { existsSync, promises, readFileSync as fsRead, writeFileSync } from "fs";
+import * as P                                                          from "purify-ts";
 
 
 type FileExistsAsync = (filePath: string) => P.EitherAsync<false, true>;

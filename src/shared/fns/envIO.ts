@@ -1,6 +1,6 @@
-import * as P    from 'purify-ts';
-import { Maybe } from 'purify-ts';
-import * as R    from 'ramda';
+import * as P    from "purify-ts";
+import { Maybe } from "purify-ts";
+import * as R    from "ramda";
 
 
 export type GetEnvIO = () => P.Maybe<typeof process.env>
@@ -19,7 +19,7 @@ export const getEnvOrThrowIO: GetEnvOrThrowIO = (err?) => () =>
     safeGetEnvIO()
         .ifNothing(() => {
             P.Maybe.of(err)
-                .alt(P.Just(new Error('failed to load env')))
+                .alt(P.Just(new Error("failed to load env")))
                 .map((e) => {
                     throw e;
                 });

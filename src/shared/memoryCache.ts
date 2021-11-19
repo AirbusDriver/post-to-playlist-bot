@@ -18,7 +18,7 @@ export type Hasher<T> = (item: T) => string;
 
 const getItemFromCache = <K, T>(hasher: Hasher<K>) => (cache: nodeCache, logger?: Logger) => (hashable: K): P.Maybe<T> => {
     return P.Either.encase(() => hasher(hashable))
-        .ifLeft(err => logger?.error(`could not hash item`, {item: hashable, error: err}))
+        .ifLeft(err => logger?.error('could not hash item', {item: hashable, error: err}))
         .toMaybe()
         .chainNullable(key => cache.get<T>(key));
 };
@@ -33,12 +33,12 @@ const setItemToCache = <K, T>(hasher: Hasher<K>) => (cache: nodeCache, logger?: 
             (key: string) => cache.set(key, val),
             R.ifElse(
                 R.equals(true),
-                (k) => logger?.debug(`setItemToCache: success`, {item: hashable}),
-                (k) => logger?.error(`setItemToCache: failed`, {item: hashable})
+                (k) => logger?.debug('setItemToCache: success', {item: hashable}),
+                (k) => logger?.error('setItemToCache: failed', {item: hashable})
             )
         ))
         .map(R.always(val))
-        .ifLeft(err => logger?.error(`setItemToCache: failed`, {item: hashable, error: err}));
+        .ifLeft(err => logger?.error('setItemToCache: failed', {item: hashable, error: err}));
 };
 
 const setManyItemsToCache = <K, T>(hasher: Hasher<K>) => (cache: nodeCache, logger?: Logger) => (entries: [ K, T ][]): P.Either<Error, T>[] => {

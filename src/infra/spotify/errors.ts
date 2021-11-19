@@ -1,18 +1,18 @@
-import { RawError }                                        from '@/shared';
-import { SpotifyErrorResponse, spotifyErrorResponseCodec } from '@infra/spotify/spotifyWebApiUtils';
-import * as R                                              from 'ramda';
+import { RawError }                                        from "@/shared";
+import { SpotifyErrorResponse, spotifyErrorResponseCodec } from "@infra/spotify/spotifyWebApiUtils";
+import * as R                                              from "ramda";
 
 
 export enum SpotifyErrorNames {
-    AUTH = 'AUTH',
-    BAD_REQUEST = 'BAD_REQUEST',
-    CONFIG = 'CONFIG',
-    ERROR_RESPONSE = 'ERROR_RESPONSE',
-    EXTERNAL = 'EXTERNAL',
+    AUTH = "AUTH",
+    BAD_REQUEST = "BAD_REQUEST",
+    CONFIG = "CONFIG",
+    ERROR_RESPONSE = "ERROR_RESPONSE",
+    EXTERNAL = "EXTERNAL",
     NO_RESULT = "NO_RESULT",
-    PERSISTENCE = 'PERSISTENCE',
-    RUNTIME = 'RUNTIME',
-    UNKNOWN_RESPONSE = 'UNKNOWN_RESPONSE',
+    PERSISTENCE = "PERSISTENCE",
+    RUNTIME = "RUNTIME",
+    UNKNOWN_RESPONSE = "UNKNOWN_RESPONSE",
     RATE_LIMIT = "RATE_LIMIT"
 }
 

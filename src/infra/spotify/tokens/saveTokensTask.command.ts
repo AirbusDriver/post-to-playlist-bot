@@ -1,8 +1,8 @@
 import {
     createSaveAuthTokensRoot,
     saveTokensToFile,
-}                         from '@infra/spotify/tokens/saveTokensTask.root';
-import { SaveTokensTask } from './types';
+}                         from "@infra/spotify/tokens/saveTokensTask.root";
+import { SaveTokensTask } from "./types";
 
 
 /**

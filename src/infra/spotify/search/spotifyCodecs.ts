@@ -1,5 +1,5 @@
-import { spotifyWebApiCodecFactory } from '@infra/spotify/spotifyWebApiUtils';
-import * as P                        from 'purify-ts';
+import { spotifyWebApiCodecFactory } from "@infra/spotify/spotifyWebApiUtils";
+import * as P                        from "purify-ts";
 
 //// Raw Web API Response Codecs ////
 
@@ -26,9 +26,9 @@ const spotifySearchListingCodec = P.Codec.interface({
 // Items //
 
 enum ItemType {
-    track = 'track',
-    album = 'album',
-    artist = 'artist'
+    track = "track",
+    album = "album",
+    artist = "artist"
 }
 
 

@@ -1,7 +1,7 @@
-import { SpotifyError }  from '@infra/spotify/errors';
-import { AuthTokens }    from '@infra/spotify/tokens/types';
-import EventEmitter      from 'events';
-import TypedEventEmitter from 'typed-emitter';
+import { SpotifyError }  from "@infra/spotify/errors";
+import { AuthTokens }    from "@infra/spotify/tokens/types";
+import EventEmitter      from "events";
+import TypedEventEmitter from "typed-emitter";
 
 
 type SpotifyAuthEvents = {

@@ -1,10 +1,10 @@
-import { musicRouterFactoryTask } from '@/music/http/router';
-import { getRootLogger }          from '@shared/logger';
-import { json, Router }           from 'express';
-import { EitherAsync }            from 'purify-ts';
+import { musicRouterFactoryTask } from "@/music/http/router";
+import { getRootLogger }          from "@shared/logger";
+import { json, Router }           from "express";
+import { EitherAsync }            from "purify-ts";
 
 
-const logger = getRootLogger().child({module: 'api'});
+const logger = getRootLogger().child({module: "api"});
 
 const apiRouterFactory = EitherAsync(async ctx => {
 
@@ -24,13 +24,13 @@ const apiRouterFactory = EitherAsync(async ctx => {
         next();
     });
 
-    apiRouter.use('/music', musicRouter);
+    apiRouter.use("/music", musicRouter);
 
-    apiRouter.all('*', async (req, res) => {
+    apiRouter.all("*", async (req, res) => {
         return res.status(404).json({
             error: {
-                message: 'invalid route',
-                name: 'NOT_FOUND'
+                message: "invalid route",
+                name: "NOT_FOUND"
             }
         });
     });

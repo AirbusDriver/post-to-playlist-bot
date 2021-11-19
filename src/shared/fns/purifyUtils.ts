@@ -1,14 +1,14 @@
-import { sleep }                                          from '@fns/delay';
-import * as P                                             from 'purify-ts';
-import { always, Either, EitherAsync, Maybe, MaybeAsync } from 'purify-ts';
-import * as R                                             from 'ramda';
+import { sleep }                                          from "@fns/delay";
+import * as P                                             from "purify-ts";
+import { always, Either, EitherAsync, Maybe, MaybeAsync } from "purify-ts";
+import * as R                                             from "ramda";
 
 
 export {
     always, Either, EitherAsync, Right, Left, Maybe, Just, Nothing, NonEmptyList, curry, DecodeError, Tuple
-} from 'purify-ts';
+} from "purify-ts";
 
-export { pipe } from 'ramda';
+export { pipe } from "ramda";
 
 // Type helpers
 
@@ -62,9 +62,9 @@ export const fromPromiseEA = EitherAsync.fromPromise;
 
 export type LeftRightAccum<L, R> = { lefts: readonly L[], rights: readonly R[] }
 
-const leftLens = R.lensProp<LeftRightAccum<any, any>>('lefts');
+const leftLens = R.lensProp<LeftRightAccum<any, any>>("lefts");
 
-const rightLens = R.lensProp<LeftRightAccum<any, any>>('rights');
+const rightLens = R.lensProp<LeftRightAccum<any, any>>("rights");
 
 
 /**
@@ -77,7 +77,7 @@ const rightLens = R.lensProp<LeftRightAccum<any, any>>('rights');
  * @param {number} delay
  * @return {<L, R>(tasks: EitherAsync<L, R>[]) => Promise<LeftRightAccum<L, R>>}
  */
-export const runEAsyncsWithDelayPara = (delay: number = 0) => async <L, R>(tasks: P.EitherAsync<L, R>[]): Promise<LeftRightAccum<L, R>> => {
+export const runEAsyncsWithDelayPara = (delay = 0) => async <L, R>(tasks: P.EitherAsync<L, R>[]): Promise<LeftRightAccum<L, R>> => {
     return R.reduce(async (memo, t) => {
 
         await sleep(delay);
@@ -108,7 +108,7 @@ export const runEAsyncsWithDelayPara = (delay: number = 0) => async <L, R>(tasks
  * @param {number} delay
  * @return {<L, R>(tasks: EitherAsync<L, R>[]) => Promise<LeftRightAccum<L, R>>}
  */
-export const runEAsyncsWithDelaySeq = (delay: number = 0) => async <L, R>(tasks: P.EitherAsync<L, R>[]): Promise<LeftRightAccum<L, R>> => {
+export const runEAsyncsWithDelaySeq = (delay = 0) => async <L, R>(tasks: P.EitherAsync<L, R>[]): Promise<LeftRightAccum<L, R>> => {
     return R.reduce(async (memo, t) => {
 
         const accum = await memo;
@@ -136,7 +136,7 @@ export const runEAsyncsWithDelaySeq = (delay: number = 0) => async <L, R>(tasks:
  * @param {number} delay
  * @return {<J>(tasks: MaybeAsync<J>[]) => Promise<J[]>}
  */
-export const runMAsyncsWithDelaySeq = (delay: number = 0) => async <J>(tasks: P.MaybeAsync<J>[]): Promise<J[]> => {
+export const runMAsyncsWithDelaySeq = (delay = 0) => async <J>(tasks: P.MaybeAsync<J>[]): Promise<J[]> => {
     return R.reduce(async (memo, t) => {
 
         const accum = await memo;
@@ -163,7 +163,7 @@ export const runMAsyncsWithDelaySeq = (delay: number = 0) => async <J>(tasks: P.
  * @param {number} delay
  * @return {<J>(tasks: MaybeAsync<J>[]) => Promise<J[]>}
  */
-export const runMAsyncWithDelayPara = (delay: number = 0) => async <J>(tasks: P.MaybeAsync<J>[]): Promise<J[]> => {
+export const runMAsyncWithDelayPara = (delay = 0) => async <J>(tasks: P.MaybeAsync<J>[]): Promise<J[]> => {
     return R.reduce(async (memo, t) => {
 
         await sleep(delay);

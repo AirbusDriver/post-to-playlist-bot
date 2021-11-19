@@ -1,1 +1,1 @@
-export {getSongPostsFromSubredditTaskRoot, GetSongPostsDto} from './getSongPostsFromSubreddit.root'
+export {getSongPostsFromSubredditTaskRoot, GetSongPostsDto} from "./getSongPostsFromSubreddit.root"

@@ -1,13 +1,13 @@
-import { SpotifyItem, TrackInfo }                   from '@/music/types';
-import CacheIO                                      from '@fns/CacheIO';
-import getSpotifyLogger                             from '@infra/spotify/logger';
-import { createMemoryCache, Hasher, KeyValueCache } from '@shared/memoryCache';
-import nodeCache                                    from 'node-cache';
-import * as R                                       from 'ramda';
+import { SpotifyItem, TrackInfo }                   from "@/music/types";
+import CacheIO                                      from "@fns/CacheIO";
+import getSpotifyLogger                             from "@infra/spotify/logger";
+import { createMemoryCache, Hasher, KeyValueCache } from "@shared/memoryCache";
+import nodeCache                                    from "node-cache";
+import * as R                                       from "ramda";
 
 
 
-const logger = getSpotifyLogger().child({module: 'spotify/search/trackCache'})
+const logger = getSpotifyLogger().child({module: "spotify/search/trackCache"})
 
 
 const trackHashTransforms = {
@@ -22,7 +22,7 @@ const hashTrack: Hasher<TrackInfo> = (track: TrackInfo): string => {
         R.toPairs,
         R.sortBy(x => x[0]),
         R.flatten,
-        R.join('-'),
+        R.join("-"),
     )(track);
 };
 

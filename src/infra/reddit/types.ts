@@ -1,6 +1,6 @@
-import { TrackInfo }                     from '@/music/types';
-import Snoowrap                          from 'snoowrap';
-import { RedditError, RedditErrorTypes } from './errors';
+import { TrackInfo }                     from "@/music/types";
+import Snoowrap                          from "snoowrap";
+import { RedditError, RedditErrorTypes } from "./errors";
 
 
 export type RedditConfig = {
@@ -13,7 +13,7 @@ export type RedditConfig = {
 
 
 export type SubmissionSummary = Pick<Snoowrap.Submission,
-    'id' | 'title' | 'permalink' | 'created_utc' | 'score' | 'upvote_ratio'>
+    "id" | "title" | "permalink" | "created_utc" | "score" | "upvote_ratio">
 
 
 export type TrackSubmissionSummary = {
@@ -31,9 +31,9 @@ export interface ListingOptions {
 
 export type ListingTimes = "all" | "year" | "month" | "week" | "day"
 
-export type TimeFrameListing = 'top'
+export type TimeFrameListing = "top"
 
-export type NonTimeFrameListing = 'hot' | 'new' | 'rising'
+export type NonTimeFrameListing = "hot" | "new" | "rising"
 
 
 export { RedditErrorTypes, RedditError };

@@ -15,4 +15,8 @@ module.exports = {
     setupFiles: [
         "<rootDir>/tests/setupBeforeEnv/dotenvRedir.ts",
     ],
+    testMatch: [
+        "**/__tests__/**/*.(spec|test).(js|ts)"
+    ],
+    roots: ['./src', './tests']
 };

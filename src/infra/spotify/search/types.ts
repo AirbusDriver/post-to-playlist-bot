@@ -1,6 +1,6 @@
-import { SearchForTrackCommandTask }  from '@infra/spotify/search/searchForTrack.root';
-import { SearchForManyTracksTask }    from './searchForManyTracks.factory';
-import { SpotifyTrackSearchResponse } from './spotifyCodecs';
+import { SearchForTrackCommandTask }  from "@infra/spotify/search/searchForTrack.root";
+import { SearchForManyTracksTask }    from "./searchForManyTracks.factory";
+import { SpotifyTrackSearchResponse } from "./spotifyCodecs";
 
 
 export interface SearchService {

@@ -1,7 +1,7 @@
-import SpotifyWebApi                   from 'spotify-web-api-node';
-import { createSearchForManyTracks }   from './searchForManyTracks.factory';
-import { createSearchForTrackCommand } from './searchForTrack.factory';
-import { SearchService }               from './types';
+import SpotifyWebApi                   from "spotify-web-api-node";
+import { createSearchForManyTracks }   from "./searchForManyTracks.factory";
+import { createSearchForTrackCommand } from "./searchForTrack.factory";
+import { SearchService }               from "./types";
 
 
 export {
