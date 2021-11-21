@@ -49,7 +49,7 @@ import {
 }                                            from '@/music/searchForSongPosts.controller.json';
 import { getSongPostsFromSubredditTaskRoot } from '@/infra/reddit/songPosts';
 import { getClient }                         from '@/infra/reddit';
-import { createSearchService }               from '@/infra/spotify/search';
+import { createSearchServiceFromClient }     from '@/infra/spotify/search';
 import { getAuthorizedClientTask }           from '@/infra/spotify';
 import { liftEA }                            from '@fns';
 import { stringifyJsonSafe }                 from '@fns/json';
@@ -60,7 +60,7 @@ import * as R                                from 'ramda';
 const main = P.EitherAsync(async ctx => {
 
     const songPostLookup = await ctx.liftEither(getClient().ap(P.Right(getSongPostsFromSubredditTaskRoot)));
-    const searchService = await ctx.fromPromise(getAuthorizedClientTask.map(createSearchService).run());
+    const searchService = await ctx.fromPromise(getAuthorizedClientTask.map(createSearchServiceFromClient).run());
 
     const env: searchForSongEnv = {
         getSongPosts: songPostLookup,
@@ -85,7 +85,7 @@ const main = P.EitherAsync(async ctx => {
         .run();
 });
 
-main.ifRight(resp => console.log(resp.extract())).run();
+main.ifRight(results => console.log(results.extract())).run();
 
 //
 // [
@@ -183,25 +183,25 @@ main.ifRight(resp => console.log(resp.extract())).run();
 ```typescript
 
 /**
- * 
+ *
  * When calling out to track search service, any recently searched TrackInfo items
  * will be cached in memory. Unless you're planing on doing your own rate limiting,
  * use the searchService to offload from Spotify API so you arent pressed up against
  * rate limit errors.
- * 
+ *
  */
-import { createSearchService, getAuthorizedClientCache } from '@/infra/spotify';
-import getSpotifyLogger                                  from '@infra/spotify/logger';
-import songMemoryCacheCacheIO                            from '@infra/spotify/search/trackCache';
-import { stringifyJsonUnsafe }                           from '@shared/fns/json';
-import { EitherAsync }                                   from 'purify-ts';
+import { createSearchServiceFromClient, getAuthorizedClientCache } from '@/infra/spotify';
+import getSpotifyLogger                                            from '@infra/spotify/logger';
+import songMemoryCacheCacheIO                                      from '@infra/spotify/search/trackCache';
+import { stringifyJsonUnsafe }                                     from '@shared/fns/json';
+import { EitherAsync }                                             from 'purify-ts';
 
 
 const prog = EitherAsync<any, any>(async ctx => {
 
     const client = await ctx.fromPromise(getAuthorizedClientCache.getLazy());
 
-    const searchService = createSearchService(client);
+    const searchService = createSearchServiceFromClient(client);
 
     getSpotifyLogger().info('service started');
 
@@ -218,7 +218,7 @@ const prog = EitherAsync<any, any>(async ctx => {
     const task = EitherAsync(async ctx => {
         const start = Date.now();
         const result = await searchService.searchForManyTracks({tracks: songsDtos})
-            .map(resp => resp.length).run();
+            .map(results => results.length).run();
         const stop = Date.now();
 
         return {

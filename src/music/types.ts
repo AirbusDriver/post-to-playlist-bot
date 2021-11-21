@@ -13,6 +13,7 @@ export type SpotifyItem<T> = {
 
 export type PlaylistInfo = {
     name: string,
+    id: string,
     tracks: TrackInfo[];
 }
 

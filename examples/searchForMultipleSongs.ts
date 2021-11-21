@@ -6,18 +6,16 @@
  * rate limit errors
  *
  */
-import { createSearchService, getAuthorizedClientCache } from '@/infra/spotify';
-import getSpotifyLogger                                  from '@infra/spotify/logger';
-import songMemoryCacheCacheIO                            from '@infra/spotify/search/trackCache';
-import { stringifyJsonUnsafe }                           from '@shared/fns/json';
-import { EitherAsync }                                   from 'purify-ts';
+import getSpotifyLogger         from '@infra/spotify/logger';
+import songMemoryCacheCacheIO   from '@infra/spotify/search/trackCache';
+import { stringifyJsonUnsafe }  from '@shared/fns/json';
+import { EitherAsync }          from 'purify-ts';
+import { getSearchServiceTask } from '../src/infra/spotify/adapters/searchService';
 
 
 const prog = EitherAsync<any, any>(async ctx => {
 
-    const client = await ctx.fromPromise(getAuthorizedClientCache.getLazy());
-
-    const searchService = createSearchService(client);
+    const searchService = await ctx.fromPromise(getSearchServiceTask.run());
 
     getSpotifyLogger().info('service started');
 

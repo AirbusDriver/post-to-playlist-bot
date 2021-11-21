@@ -1,12 +1,10 @@
-import SpotifyWebApi              from "spotify-web-api-node";
+import { SearchForManyTracksDto, SearchForManyTracksTask, SearchForManyTracksTaskResponse } from '@/music/ports';
+import SpotifyWebApi                                                                        from 'spotify-web-api-node';
 import {
-    SearchForManyTracksDto,
-    SearchForManyTracksTask,
     SearchForManyTracksTaskEnv,
-    SearchForManyTracksTaskResponse,
     searchForManyTracksTaskRoot
-}                                 from "./searchForManyTracks.root";
-import { songMemoryCacheCacheIO } from "./trackCache";
+}                                                                                           from './searchForManyTracks.root';
+import { songMemoryCacheCacheIO }                                                           from './trackCache';
 
 
 export const createSearchForManyTracks = (client: SpotifyWebApi) => {

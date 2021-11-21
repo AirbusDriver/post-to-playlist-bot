@@ -1,10 +1,10 @@
 import {
     searchForSongPostsRoot,
     Env as searchForSongEnv
-}                                            from '../src/music/searchForSongPosts.controller.json.express';
+}                                            from '../src/music/searchForSongPosts.controller.json';
 import { getSongPostsFromSubredditTaskRoot } from '@/infra/reddit/songPosts';
 import { getClient }                         from '@/infra/reddit';
-import { createSearchService }               from '@/infra/spotify/search';
+import { createSearchServiceFromClient }     from '@/infra/spotify/search';
 import { getAuthorizedClientTask }           from '@/infra/spotify';
 import { liftEA }                            from '@fns';
 import { stringifyJsonSafe }                 from '@fns/json';
@@ -15,7 +15,7 @@ import * as R                                from 'ramda';
 const main = P.EitherAsync(async ctx => {
 
     const songPostLookup = await ctx.liftEither(getClient().ap(P.Right(getSongPostsFromSubredditTaskRoot)));
-    const searchService = await ctx.fromPromise(getAuthorizedClientTask.map(createSearchService).run());
+    const searchService = await ctx.fromPromise(getAuthorizedClientTask.map(createSearchServiceFromClient).run());
 
     const env: searchForSongEnv = {
         getSongPosts: songPostLookup,

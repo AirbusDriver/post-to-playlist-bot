@@ -1,12 +1,11 @@
+import { SearchForManyTracksDto, SearchService }                                       from '@/music/ports';
 import { SpotifyItem, TrackInfo }                                                      from '@/music/types';
 import { ApplicationError, ApplicationErrorNames, RawError }                           from '@/shared';
-import { SearchService }                                                               from '@infra/ports';
 import {
     GetSongPostsDto,
     GetSongPostsTask
 }                                                                                      from '@infra/reddit/songPosts/getSongPostsFromSubreddit.root';
 import { ListingTimes, NonTimeFrameListing, TimeFrameListing, TrackSubmissionSummary } from '@infra/reddit/types';
-import { SearchForManyTracksDto }                                                      from '@infra/spotify/search/searchForManyTracks.root';
 import getLogger                                                                       from '@shared/logger';
 import * as P                                                                          from 'purify-ts';
 import { EitherAsync, Right }                                                          from 'purify-ts';
@@ -50,20 +49,20 @@ const dtoListCodec: P.Codec<P.FromType<WithoutTimeDto>> = P.Codec.interface({
 
 type SearchSongPostsDtoCodec = P.Codec<P.FromType<SearchSongPostsDto>>
 export const searchSongPostsDtoCodec: SearchSongPostsDtoCodec = P.intersect(P.Codec.interface({
-    subreddit: P.string,
-    limit: P.Codec.custom<number>(
-        {
-            decode: input => R.cond([
-                [ R.pipe(parseInt, isNaN), R.always(P.Left('not a number')) ],
-                [ R.flip(R.gte)(150), R.always(P.Left('number must be between 0 - 150')) ],
-                [ R.flip(R.lt)(1), R.always(P.Left('number must be greater than 0')) ],
-                [ R.T, R.pipe(parseInt, Right) ]
-            ])(input),
-            encode: R.identity
-        }
-    )
-}),
-P.oneOf([ dtoListCodec, dtoTimeCodec ]));
+        subreddit: P.string,
+        limit: P.Codec.custom<number>(
+            {
+                decode: input => R.cond([
+                    [ R.pipe(parseInt, isNaN), R.always(P.Left('not a number')) ],
+                    [ R.flip(R.gte)(150), R.always(P.Left('number must be between 0 - 150')) ],
+                    [ R.flip(R.lt)(1), R.always(P.Left('number must be greater than 0')) ],
+                    [ R.T, R.pipe(parseInt, Right) ]
+                ])(input),
+                encode: R.identity
+            }
+        )
+    }),
+    P.oneOf([ dtoListCodec, dtoTimeCodec ]));
 
 
 export enum SearchSongPostsErrorReasons {
@@ -85,7 +84,7 @@ export type SearchForSongPostsTask = (dto: SearchSongPostsDto) => EitherAsync<Se
 
 export type Env = {
     spotifySearch: SearchService;
-    getSongPosts: GetSongPostsTask;
+    getSongPosts: GetSongPostsTask;  // todo: move to a port. this dependency is pointing the wrong way
 }
 
 export const searchForSongPostsRoot = (env: Env): SearchForSongPostsTask => {
@@ -144,25 +143,6 @@ export const searchForSongPostsRoot = (env: Env): SearchForSongPostsTask => {
                 .run());
 
 
-            // const trackLocationTasks = trackPosts.map(post => {
-            //     return env.spotifySearch.searchForTrack(post.trackInfo)
-            //         .map<[ TrackSubmissionSummary, SpotifyItem<TrackInfo>[] ]>(loc => [ post, loc ])
-            //         .mapLeft<SearchSongPostsError>(err => ({
-            //             name: SearchSongPostsErrorReasons.SERVICE_ERROR,
-            //             message: 'could not reach spotifySearch service',
-            //             orig: err.orig
-            //         }))
-            //         .ifLeft(err => logger.debug(`could not find track info`, {data: post.trackInfo, err: err}))
-            //         .ifRight(_ => logger.debug(`found track info`, {data: post.trackInfo}));
-            // });
-            //
-            // const potentialTrackLocations = await runEAsyncsWithDelaySeq(SPOTIFY_DELAY)(trackLocationTasks);
-            //
-            // const iterationResults: [ TrackSubmissionSummary, SpotifyItem<TrackInfo> | null ][] =
-            //     potentialTrackLocations.rights.map(([ k, v ]) => {
-            //         return [ k, P.List.head(v).extractNullable() ];
-            //     });
-
             const searchForTracksDto: SearchForManyTracksDto = {
                 tracks: trackPosts.map(x => x.trackInfo)
             };
@@ -177,7 +157,7 @@ export const searchForSongPostsRoot = (env: Env): SearchForSongPostsTask => {
 
 
             const iterationResults = trackPosts.map(post => {
-                const location = P.Maybe.fromNullable(R.find(item => R.equals(post.trackInfo)(item.track), trackResults)?.resp);
+                const location = P.Maybe.fromNullable(R.find(item => R.equals(post.trackInfo)(item.track), trackResults)?.results);
                 return [ post, location.extractNullable() ] as [ TrackSubmissionSummary, SpotifyItem<TrackInfo> | null ];
             });
 

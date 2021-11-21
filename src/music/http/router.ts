@@ -1,15 +1,16 @@
-import { getClient }                                    from "@/infra/reddit";
-import { searchSongPostJsonController }                 from "@/music/searchForSongPosts.controller.json.express";
-import { searchForSongPostsRoot }                       from "@/music/searchForSongPosts.root";
-import { searchForTrackInfoControllerJsonExpress }      from "@/music/searchForTrackInfo.controller.json.express";
-import { getSongPostsFromSubredditTaskRoot }            from "@infra/reddit/songPosts";
-import { createSearchService, getAuthorizedClientTask } from "@infra/spotify";
-import getRootLogger                                    from "@shared/logger";
-import { json, Router }                                 from "express";
-import { EitherAsync }                                  from "purify-ts";
+import { getClient }                          from '@/infra/reddit';
+import { searchForSingleTrackControllerJson } from '@/music/http/controllers/searchForSingleTrack.controller.json';
+import { getSongPostsFromSubredditTaskRoot }  from '@infra/reddit/songPosts';
+import { getSearchServiceTask }               from '@infra/spotify/adapters/searchService';
+import getRootLogger                          from '@shared/logger';
+import { json, Router }                       from 'express';
+import { EitherAsync }                        from 'purify-ts';
+import { searchForSongPostsRoot }             from '../searchForSongPosts.root';
+import { searchForManyTracksControllerJson }  from './controllers/searchForManyTracks.controller.json';
+import { searchSongPostJsonController }       from './controllers/searchForSongPosts.controller.json';
 
 
-const logger = getRootLogger().child({module: "music-api"});
+const logger = getRootLogger().child({module: 'music-api'});
 
 
 export const musicRouterFactoryTask = EitherAsync<any, Router>(async ctx => {
@@ -19,44 +20,21 @@ export const musicRouterFactoryTask = EitherAsync<any, Router>(async ctx => {
 
     const redditClient = await ctx.liftEither(getClient());
 
-    const spotifyService = await ctx.fromPromise(getAuthorizedClientTask
-        .ifLeft(console.error)
-        .run());
-
-    const searchService = createSearchService(spotifyService);
+    const searchService = await ctx.fromPromise(getSearchServiceTask.run());
 
 
-    // Controllers
+    router.get('/song-posts',
+        searchSongPostJsonController(searchForSongPostsRoot({
+            spotifySearch: searchService,
+            getSongPosts: getSongPostsFromSubredditTaskRoot(redditClient)
+        })));
 
-    const searchForSongPostsController = searchSongPostJsonController(searchForSongPostsRoot({
-        spotifySearch: searchService,
-        getSongPosts: getSongPostsFromSubredditTaskRoot(redditClient)
-    }));
+    router.post('/search/tracks', searchForManyTracksControllerJson(searchService));
 
-
-    // Routes
-
-    router.get("/song-posts", async (req, res) => {
-
-        await searchForSongPostsController(req)
-            .ifRight(resp => res.json(resp))
-            .ifLeft(err => res.status(err.error.code).json(err))
-            .void()
-            .run();
-    });
-
-    router.post("/search/tracks", async (req, res) => {
-
-        logger.info(req.body);
-
-        await searchForTrackInfoControllerJsonExpress({searchService})(req)
-            .ifRight(resp => res.json(resp))
-            .ifLeft(err => res.status(500).json(err)).run();
-
-    });
+    router.get('/search/tracks', searchForSingleTrackControllerJson(searchService));
 
     return router;
-
+    
 });
 
 export default musicRouterFactoryTask;

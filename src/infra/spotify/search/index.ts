@@ -1,7 +1,7 @@
-import SpotifyWebApi                   from "spotify-web-api-node";
-import { createSearchForManyTracks }   from "./searchForManyTracks.factory";
-import { createSearchForTrackCommand } from "./searchForTrack.factory";
-import { SearchService }               from "./types";
+import { SearchService }               from '@/music/ports';
+import SpotifyWebApi                   from 'spotify-web-api-node';
+import { createSearchForManyTracks }   from './searchForManyTracks.factory';
+import { createSearchForTrackCommand } from './searchForTrack.factory';
 
 
 export {
@@ -15,7 +15,7 @@ export {
  * @param {SpotifyWebApi} client
  * @return {SearchService}
  */
-export const createSearchService = (client: SpotifyWebApi): SearchService => {
+export const createSearchServiceFromClient = (client: SpotifyWebApi): SearchService => {
 
     return {
         searchForTrack: createSearchForTrackCommand(client),

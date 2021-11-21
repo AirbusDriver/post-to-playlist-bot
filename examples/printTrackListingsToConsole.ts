@@ -5,13 +5,13 @@
  * was started by requesting the instance.
  *
  */
-import { liftEA }                                        from '@fns';
-import { getClient }                                     from '@infra/reddit';
-import { getSongPostsFromSubredditTaskRoot }             from '@infra/reddit/songPosts';
-import { createSearchService, getAuthorizedClientCache } from '@infra/spotify';
-import * as P                                            from 'purify-ts';
-import { EitherAsync }                                   from 'purify-ts';
-import * as R                                            from 'ramda';
+import { liftEA }                                                  from '@fns';
+import { getClient }                                               from '@infra/reddit';
+import { getSongPostsFromSubredditTaskRoot }                       from '@infra/reddit/songPosts';
+import { createSearchServiceFromClient, getAuthorizedClientCache } from '@infra/spotify';
+import * as P                                                      from 'purify-ts';
+import { EitherAsync }                                             from 'purify-ts';
+import * as R                                                      from 'ramda';
 
 
 const subreddit = 'metalcore';
@@ -23,7 +23,7 @@ const main = EitherAsync(async ctx => {
 
     const spotify = await ctx.fromPromise(getAuthorizedClientCache.getLazy());
 
-    const search = createSearchService(spotify);
+    const search = createSearchServiceFromClient(spotify);
 
     const songDetails = await ctx.fromPromise(getSongPostsFromSubredditTaskRoot(client)({
         subreddit,
