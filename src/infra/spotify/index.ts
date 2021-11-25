@@ -6,7 +6,8 @@ import { EitherAsync }                      from 'purify-ts';
 import SpotifyWebApi                        from 'spotify-web-api-node';
 
 
-export { SpotifyAuthTokenService } from './tokens';
+export { searchUserPlaylistsWithRoot, PlaylistItemIsResult } from './playlists';
+export { SpotifyAuthTokenService }                           from './tokens';
 
 export const getAuthorizedClientTask = EitherAsync<SpotifyError, SpotifyWebApi>(async ctx => {
     const client = await ctx.fromPromise(getClientWithAuthCredentialsTask.run());

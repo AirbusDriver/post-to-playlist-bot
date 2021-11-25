@@ -4,14 +4,14 @@ import { liftMA }                                               from '@fns';
 import { SpotifyError, SpotifyErrorNames }                      from '@infra/spotify';
 import { errorFactory }                                         from '@infra/spotify/errors';
 import getSpotifyLogger                                         from '@infra/spotify/logger';
-import { spotifyApiTrackSearchResponseCodec, SpotifyTrackItem } from '@infra/spotify/search/spotifyCodecs';
 import { SpotifyTrackSearchResponse }                           from '@infra/spotify/search/types';
+import { spotifyApiTrackSearchResponseCodec, SpotifyTrackItem } from '@infra/spotify/spotifyCodecs';
 import { mapSpotifyErrorResponseToSpotifyError }                from '@infra/spotify/spotifyWebApiUtils';
 import * as P                                                   from 'purify-ts';
 import { EitherAsync, Maybe }                                   from 'purify-ts';
 import R                                                        from 'ramda';
 import SpotifyWebApi                                            from 'spotify-web-api-node';
-import { songMemoryCacheCacheIO, SpotifyTrackItemCache }        from './trackCache';
+import { SpotifyTrackItemCache }                                from './trackCache';
 
 
 const logger = getSpotifyLogger().child({module: 'spotify/search/searchForTrack'});
@@ -81,7 +81,7 @@ export const searchForTrackWithClient = (client: SpotifyWebApi): DoSearchForTrac
                 searchString: queryString,
                 params: queryParams
             },
-            result: results.body.tracks.items
+            result: (results as any).body.tracks.items
         });
 
         return results;

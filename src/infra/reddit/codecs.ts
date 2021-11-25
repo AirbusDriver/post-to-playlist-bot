@@ -1,5 +1,5 @@
-import * as P                                              from "purify-ts";
-import { ListingOptions, RedditConfig, SubmissionSummary } from "./types";
+import * as P                                              from 'purify-ts';
+import { ListingOptions, RedditConfig, SubmissionSummary } from './types';
 
 
 export const redditConfigCodec: P.Codec<P.FromType<RedditConfig>> = P.Codec.interface({

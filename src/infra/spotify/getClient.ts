@@ -1,6 +1,6 @@
-import { getSpotifyConfigSafe }                                                      from "./config";
-import { fetchAuthTokensTask }                                                       from "@infra/spotify/tokens";
-import { GetClientTask, addAuthorizationToClientRoot, createUnauthorizedClientRoot } from "./getClient.root";
+import { fetchAuthTokensTask }                                                       from '@infra/spotify/tokens';
+import { getSpotifyConfigSafe }                                                      from './config';
+import { addAuthorizationToClientRoot, createUnauthorizedClientRoot, GetClientTask } from './getClient.root';
 
 
 /** A task that when run, will resolve with a client without the authorization credentials */

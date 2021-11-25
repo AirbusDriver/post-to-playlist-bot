@@ -1,7 +1,7 @@
-import { errorFactory, SpotifyError } from "@infra/spotify/errors";
-import { PromiseValue }               from "@shared/utils/utilityTypes";
-import * as P                         from "purify-ts";
-import SpotifyWebApi                  from "spotify-web-api-node";
+import { errorFactory, SpotifyError } from '@infra/spotify/errors';
+import { PromiseValue }               from '@shared/utils/utilityTypes';
+import * as P                         from 'purify-ts';
+import SpotifyWebApi                  from 'spotify-web-api-node';
 
 
 // Interfaces
@@ -36,7 +36,7 @@ export const spotifyErrorResponseCodec: SpotifyErrorResponseCodec = P.Codec.inte
 
 // Concrete Response Codecs
 
-type SpotifyCodeGrantResponseCodec = P.Codec<P.FromType<Pick<SpotifyApiPromiseValue<"authorizationCodeGrant">, "body">>>
+type SpotifyCodeGrantResponseCodec = P.Codec<P.FromType<Pick<SpotifyApiPromiseValue<'authorizationCodeGrant'>, 'body'>>>
 
 export const spotifyCodeGrantResponseCodec: SpotifyCodeGrantResponseCodec = P.Codec.interface({
     body: P.Codec.interface({
@@ -44,6 +44,7 @@ export const spotifyCodeGrantResponseCodec: SpotifyCodeGrantResponseCodec = P.Co
         refresh_token: P.string,
         expires_in: P.number,
         token_type: P.string,
+
         scope: P.string,
     }),
 });
@@ -76,7 +77,7 @@ export const spotifyRefreshTokenResponseCodec: SpotifyRefreshTokenResponseCodec 
 export const mapSpotifyErrorResponseToSpotifyError = (resp: unknown): SpotifyError => {
     return spotifyErrorResponseCodec.decode(resp)
         .map<SpotifyError>(errorFactory.errorResponse)
-        .mapLeft<SpotifyError>(err => errorFactory.unknown("received an unknown error response", err)).extract();
+        .mapLeft<SpotifyError>(err => errorFactory.unknown('received an unknown error response', err)).extract();
 };
 
 

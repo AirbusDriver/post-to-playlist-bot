@@ -1,6 +1,6 @@
-import { SpotifyConfig, SpotifyEnvSettings } from "@infra/spotify/config/types";
-import * as P                                from "purify-ts";
-import { Codec }                             from "purify-ts";
+import { SpotifyConfig, SpotifyEnvSettings } from '@infra/spotify/config/types';
+import * as P                                from 'purify-ts';
+import { Codec }                             from 'purify-ts';
 
 
 export const configCodec: P.Codec<P.FromType<SpotifyConfig>> = Codec.interface({

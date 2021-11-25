@@ -1,14 +1,14 @@
-import { sleep }                                          from "@fns/delay";
-import * as P                                             from "purify-ts";
-import { always, Either, EitherAsync, Maybe, MaybeAsync } from "purify-ts";
-import * as R                                             from "ramda";
+import { sleep }                                          from '@fns/delay';
+import * as P                                             from 'purify-ts';
+import { always, Either, EitherAsync, Maybe, MaybeAsync } from 'purify-ts';
+import * as R                                             from 'ramda';
 
 
 export {
     always, Either, EitherAsync, Right, Left, Maybe, Just, Nothing, NonEmptyList, curry, DecodeError, Tuple
-} from "purify-ts";
+} from 'purify-ts';
 
-export { pipe } from "ramda";
+export { pipe } from 'ramda';
 
 // Type helpers
 
@@ -62,9 +62,9 @@ export const fromPromiseEA = EitherAsync.fromPromise;
 
 export type LeftRightAccum<L, R> = { lefts: readonly L[], rights: readonly R[] }
 
-const leftLens = R.lensProp<LeftRightAccum<any, any>>("lefts");
+const leftLens = R.lensProp<LeftRightAccum<any, any>>('lefts');
 
-const rightLens = R.lensProp<LeftRightAccum<any, any>>("rights");
+const rightLens = R.lensProp<LeftRightAccum<any, any>>('rights');
 
 
 /**

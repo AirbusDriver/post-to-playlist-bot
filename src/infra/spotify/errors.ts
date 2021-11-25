@@ -1,19 +1,19 @@
-import { RawError }                                        from "@/shared";
-import { SpotifyErrorResponse, spotifyErrorResponseCodec } from "@infra/spotify/spotifyWebApiUtils";
-import * as R                                              from "ramda";
+import { RawError }                                        from '@/shared';
+import { SpotifyErrorResponse, spotifyErrorResponseCodec } from '@infra/spotify/spotifyWebApiUtils';
+import * as R                                              from 'ramda';
 
 
 export enum SpotifyErrorNames {
-    AUTH = "AUTH",
-    BAD_REQUEST = "BAD_REQUEST",
-    CONFIG = "CONFIG",
-    ERROR_RESPONSE = "ERROR_RESPONSE",
-    EXTERNAL = "EXTERNAL",
-    NO_RESULT = "NO_RESULT",
-    PERSISTENCE = "PERSISTENCE",
-    RUNTIME = "RUNTIME",
-    UNKNOWN_RESPONSE = "UNKNOWN_RESPONSE",
-    RATE_LIMIT = "RATE_LIMIT"
+    AUTH = 'AUTH',
+    BAD_REQUEST = 'BAD_REQUEST',
+    CONFIG = 'CONFIG',
+    ERROR_RESPONSE = 'ERROR_RESPONSE',
+    EXTERNAL = 'EXTERNAL',
+    NO_RESULT = 'NO_RESULT',
+    PERSISTENCE = 'PERSISTENCE',
+    RUNTIME = 'RUNTIME',
+    UNKNOWN_RESPONSE = 'UNKNOWN_RESPONSE',
+    RATE_LIMIT = 'RATE_LIMIT'
 }
 
 
@@ -23,15 +23,15 @@ export const responseErrorToSpotifyError: (err: SpotifyErrorResponse) => Spotify
     return spotifyErrorResponseCodec.decode(err)
         .map(err => {
             switch (err.statusCode) {
-                case 429:
-                    return errorFactory.rateLimit(err.message, err)
-                default:
-                    return errorFactory.unknown(err.message)
+            case 429:
+                return errorFactory.rateLimit(err.message, err);
+            default:
+                return errorFactory.unknown(err.message);
             }
         })
         .mapLeft(errorFactory.unknown)
-        .extract()
-}
+        .extract();
+};
 
 const createError:
     (name: SpotifyErrorNames) => <T>(message: string, orig?: T) => SpotifyError =

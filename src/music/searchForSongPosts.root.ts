@@ -1,5 +1,5 @@
 import { SearchForManyTracksDto, SearchService }                                       from '@/music/ports';
-import { SpotifyItem, TrackInfo }                                                      from '@/music/types';
+import { SpotifyItem, SpotifyTrack, TrackInfo }                                        from '@/music/types';
 import { ApplicationError, ApplicationErrorNames, RawError }                           from '@/shared';
 import {
     GetSongPostsDto,
@@ -49,20 +49,20 @@ const dtoListCodec: P.Codec<P.FromType<WithoutTimeDto>> = P.Codec.interface({
 
 type SearchSongPostsDtoCodec = P.Codec<P.FromType<SearchSongPostsDto>>
 export const searchSongPostsDtoCodec: SearchSongPostsDtoCodec = P.intersect(P.Codec.interface({
-        subreddit: P.string,
-        limit: P.Codec.custom<number>(
-            {
-                decode: input => R.cond([
-                    [ R.pipe(parseInt, isNaN), R.always(P.Left('not a number')) ],
-                    [ R.flip(R.gte)(150), R.always(P.Left('number must be between 0 - 150')) ],
-                    [ R.flip(R.lt)(1), R.always(P.Left('number must be greater than 0')) ],
-                    [ R.T, R.pipe(parseInt, Right) ]
-                ])(input),
-                encode: R.identity
-            }
-        )
-    }),
-    P.oneOf([ dtoListCodec, dtoTimeCodec ]));
+    subreddit: P.string,
+    limit: P.Codec.custom<number>(
+        {
+            decode: input => R.cond([
+                [ R.pipe(parseInt, isNaN), R.always(P.Left('not a number')) ],
+                [ R.flip(R.gte)(150), R.always(P.Left('number must be between 0 - 150')) ],
+                [ R.flip(R.lt)(1), R.always(P.Left('number must be greater than 0')) ],
+                [ R.T, R.pipe(parseInt, Right) ]
+            ])(input),
+            encode: R.identity
+        }
+    )
+}),
+P.oneOf([ dtoListCodec, dtoTimeCodec ]));
 
 
 export enum SearchSongPostsErrorReasons {
@@ -157,8 +157,8 @@ export const searchForSongPostsRoot = (env: Env): SearchForSongPostsTask => {
 
 
             const iterationResults = trackPosts.map(post => {
-                const location = P.Maybe.fromNullable(R.find(item => R.equals(post.trackInfo)(item.track), trackResults)?.results);
-                return [ post, location.extractNullable() ] as [ TrackSubmissionSummary, SpotifyItem<TrackInfo> | null ];
+                const location = R.find(item => R.equals(post.trackInfo)(item.track), trackResults)?.results || [];
+                return [ post, P.List.head(location).extractNullable() ] as [ TrackSubmissionSummary, SpotifyTrack | null ];
             });
 
 
@@ -171,7 +171,7 @@ export const searchForSongPostsRoot = (env: Env): SearchForSongPostsTask => {
 
         const chunk = CHUNK;
         const maxDepth = validDto.limit * 3;
-        const time = validDto.type == 'top' ? validDto.time : 'all';
+        const time = validDto.type == 'top' ? validDto.time : 'all'; // fixme
         const opts = null;
 
         const initialSearchDto: GetSongPostsDto = ({
@@ -189,7 +189,7 @@ export const searchForSongPostsRoot = (env: Env): SearchForSongPostsTask => {
                 track: sub.trackInfo,
                 spotify: spot,
             }))
-            .filter(x => R.propSatisfies(R.complement(R.isNil), 'spotify', x)) as ItemDetails[];
+            .filter(x => x.spotify != null) as ItemDetails[];
 
 
         logger.debug(`finished search with ${ items.length } results`);

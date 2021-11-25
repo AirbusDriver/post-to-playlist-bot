@@ -1,5 +1,5 @@
-import { listingOptionsCodec }                       from "@infra/reddit/codecs";
-import { redditErrorFactory }                        from "@infra/reddit/errors";
+import { listingOptionsCodec }                       from '@infra/reddit/codecs';
+import { redditErrorFactory }                        from '@infra/reddit/errors';
 import {
     ListingOptions,
     ListingTimes,
@@ -8,17 +8,17 @@ import {
     RedditErrorTypes,
     TimeFrameListing,
     TrackSubmissionSummary
-}                                                    from "@infra/reddit/types";
-import getRootLogger                                 from "@shared/logger";
-import * as P                                        from "purify-ts";
-import { EitherAsync }                               from "purify-ts";
-import * as R                                        from "ramda";
-import Snoowrap                                      from "snoowrap";
-import { Submission }                                from "snoowrap/dist/objects";
-import { parseTrackSubmissionSummaryFromSubmission } from "./postParsing";
+}                                                    from '@infra/reddit/types';
+import getRootLogger                                 from '@shared/logger';
+import * as P                                        from 'purify-ts';
+import { EitherAsync }                               from 'purify-ts';
+import * as R                                        from 'ramda';
+import Snoowrap                                      from 'snoowrap';
+import { Submission }                                from 'snoowrap/dist/objects';
+import { parseTrackSubmissionSummaryFromSubmission } from './postParsing';
 
 
-const logger = getRootLogger().child({module: "songPosts/getSongPosts"});
+const logger = getRootLogger().child({module: 'songPosts/getSongPosts'});
 
 
 export type BaseDto = {
@@ -28,7 +28,7 @@ export type BaseDto = {
 
 export const DEFAULTS: Partial<GetSongPostsDto> = {
     opts: {limit: 25},
-    type: "hot",
+    type: 'hot',
 };
 
 const baseDtoCodec: P.Codec<P.FromType<BaseDto>> = P.Codec.interface({
@@ -43,8 +43,8 @@ export type TimeDto = {
 }
 
 const timeDtoCodec: P.Codec<P.FromType<TimeDto>> = P.Codec.interface({
-    type: P.exactly("top"),
-    time: P.exactly("all", "year", "month", "week", "day")
+    type: P.exactly('top'),
+    time: P.exactly('all', 'year', 'month', 'week', 'day')
 });
 
 
@@ -53,7 +53,7 @@ export type NoTimeDto = {
 }
 
 const noTimeDtoCodec: P.Codec<P.FromType<NoTimeDto>> = P.Codec.interface({
-    type: P.exactly("hot", "new", "rising")
+    type: P.exactly('hot', 'new', 'rising')
 });
 
 export type GetSongPostsDto = BaseDto & (TimeDto | NoTimeDto)
@@ -85,7 +85,7 @@ export const getSongPostsFromSubredditTaskRoot: GetSongPostsFromSubredditTaskRoo
             return new Promise((resolve, reject) => {
                 const subreddit = client.getSubreddit(safeDto.subreddit);
 
-                const time = safeDto.type == "top" ? safeDto.time : "all";
+                const time = safeDto.type == 'top' ? safeDto.time : 'all';
 
                 const transforms: Partial<Record<keyof ListingOptions, any>> = {
                     after: (s: string) => `t3_${ s }`,
@@ -99,25 +99,25 @@ export const getSongPostsFromSubredditTaskRoot: GetSongPostsFromSubredditTaskRoo
                 let searchFn: () => Promise<Snoowrap.Listing<Snoowrap.Submission>>;
 
                 switch (safeDto.type) {
-                    case "hot":
-                        searchFn = () => subreddit.getHot(prependedOpts);
-                        break;
-                    case "rising":
-                        searchFn = () => subreddit.getRising(prependedOpts);
-                        break;
-                    case "new":
-                        searchFn = () => subreddit.getNew(prependedOpts);
-                        break;
-                    case "top":
-                        searchFn = () => subreddit.getTop({...prependedOpts, time});
-                        break;
-                    default : {
-                        searchFn = () => subreddit.getHot(prependedOpts);
-                        break;
-                    }
+                case 'hot':
+                    searchFn = () => subreddit.getHot(prependedOpts);
+                    break;
+                case 'rising':
+                    searchFn = () => subreddit.getRising(prependedOpts);
+                    break;
+                case 'new':
+                    searchFn = () => subreddit.getNew(prependedOpts);
+                    break;
+                case 'top':
+                    searchFn = () => subreddit.getTop({...prependedOpts, time});
+                    break;
+                default : {
+                    searchFn = () => subreddit.getHot(prependedOpts);
+                    break;
+                }
                 }
 
-                logger.debug("searching reddit for tracks with", {
+                logger.debug('searching reddit for tracks with', {
                     received: safeDto,
                     transformed: prependedOpts
                 });
@@ -131,15 +131,15 @@ export const getSongPostsFromSubredditTaskRoot: GetSongPostsFromSubredditTaskRoo
             .mapLeft<RedditError>(err => ({
                 name: RedditErrorTypes.SERVICE_ERROR,
                 orig: JSON.stringify(err),
-                message: err.message || "an unknown error occurred with the reddit service"
+                message: err.message || 'an unknown error occurred with the reddit service'
             }));
 
         const submissionResults = await ctx.fromPromise(task.run());
 
         const maybeResults = R.map(sub => parseTrackSubmissionSummaryFromSubmission(sub)
-                .ifJust(() => logger.debug("is a song post", {title: sub.title}))
-                .ifNothing(() => logger.debug("is not a song", {title: sub.title}))
-            , submissionResults);
+            .ifJust(() => logger.debug('is a song post', {title: sub.title}))
+            .ifNothing(() => logger.debug('is not a song', {title: sub.title}))
+        , submissionResults);
 
         logger.debug(`pulled ${ submissionResults.length } submissions`, {
             titles: submissionResults.map(x => x.title)

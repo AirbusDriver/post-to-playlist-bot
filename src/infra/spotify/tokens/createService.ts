@@ -1,16 +1,16 @@
-import { SpotifyError }                    from "@infra/spotify/errors";
-import getSpotifyLogger                    from "@infra/spotify/logger";
-import { EitherAsync }                     from "purify-ts";
-import SpotifyWebApi                       from "spotify-web-api-node";
-import { checkTokensEveryRoot, timerTask } from "./autoTokens";
-import { fetchAuthTokensTask }             from "./fetchAuthTokensTask.command";
-import { refreshAndPersistTokens }         from "./refreshTokens.command";
-import { SpotifyAuthTokenService }         from "./types";
+import { SpotifyError }                    from '@infra/spotify/errors';
+import getSpotifyLogger                    from '@infra/spotify/logger';
+import { EitherAsync }                     from 'purify-ts';
+import SpotifyWebApi                       from 'spotify-web-api-node';
+import { checkTokensEveryRoot, timerTask } from './autoTokens';
+import { fetchAuthTokensTask }             from './fetchAuthTokensTask.command';
+import { refreshAndPersistTokens }         from './refreshTokens.command';
+import { SpotifyAuthTokenService }         from './types';
 
 
 export { SpotifyAuthTokenService };
 
-const logger = getSpotifyLogger().child({module: "SpotifyAuth"});
+const logger = getSpotifyLogger().child({module: 'SpotifyAuth'});
 
 type CreateAuthTokenServiceTask = (client: SpotifyWebApi) => SpotifyAuthTokenService
 
@@ -34,19 +34,19 @@ export const createAuthTokenService: CreateAuthTokenServiceTask =
             fetchTokens,
             start: EitherAsync<SpotifyError, void>(async ctx => {
                 if (timer == null) {
-                    logger.info("beginning auto refresh");
+                    logger.info('beginning auto refresh');
                     timer = await ctx.fromPromise(startAutoRefresh.run());
                     return;
                 }
-                logger.debug("auto-refresh interval already exists and start() was called on service");
+                logger.debug('auto-refresh interval already exists and start() was called on service');
             }),
             stop: EitherAsync<SpotifyError, void>(async _ => {
                 if (timer != null) {
-                    logger.info("stopping auto-refresh");
+                    logger.info('stopping auto-refresh');
                     clearInterval(timer);
                     return;
                 }
-                logger.debug("interval already stopped and stop() was called on service");
+                logger.debug('interval already stopped and stop() was called on service');
             }),
         };
         return service;

@@ -1,22 +1,21 @@
-import { SearchForTrackCommandResponse, SearchTrackDTO }                    from '@/music/ports';
-import { GetRight }                                                         from '@fns';
-import { SpotifyError }                                                     from '@infra/spotify';
-import { makeErrorReponseFromRawResponse, makeOkayResponseFromRawResponse } from '@infra/spotify/__tests__/testUtils';
-import { SpotifyTrackItemCache }                                            from '@infra/spotify/search/trackCache';
-import { SpotifyTrackSearchResponse }                                       from '@infra/spotify/search/types';
-import { PromiseValue }                                                     from '@shared/utils/utilityTypes';
-import * as P                                                               from 'purify-ts';
-import { Either }                                                           from 'purify-ts';
-import SpotifyWebApi                                                        from 'spotify-web-api-node';
+import { SearchForTrackCommandResponse, SearchTrackDTO }                                 from '@/music/ports';
+import { GetRight }                                                                      from '@fns';
+import { SpotifyError }                                                                  from '@infra/spotify';
 import {
-    SearchForTrackCommandEnv,
-    searchForTrackCommandRoot,
-    searchForTrackWithClient
-}                                                                           from '../searchForTrack.root';
+    makeErrorReponseFromRawResponse,
+    makeOkayResponseFromRawResponse
+}                                                                                        from '@infra/spotify/__tests__/testUtils';
+import { SpotifyTrackItemCache }                                                         from '@infra/spotify/search/trackCache';
+import { SpotifyTrackSearchResponse }                                                    from '@infra/spotify/search/types';
+import { PromiseValue }                                                                  from '@shared/utils/utilityTypes';
+import * as P                                                                            from 'purify-ts';
+import { Either }                                                                        from 'purify-ts';
+import SpotifyWebApi                                                                     from 'spotify-web-api-node';
+import { SearchForTrackCommandEnv, searchForTrackCommandRoot, searchForTrackWithClient } from '../searchForTrack.root';
 import emptyResponse
-                                                                            from './sampleResponses/trackSearch.emptyResult.raw.json';
+    from './sampleResponses/trackSearch.emptyResult.raw.json';
 import nonEmptyResponse
-                                                                            from './sampleResponses/trackSearch.nonEmptyResult.raw.json';
+    from './sampleResponses/trackSearch.nonEmptyResult.raw.json';
 
 
 describe('searchForTrackWithClient', () => {

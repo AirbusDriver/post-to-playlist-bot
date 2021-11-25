@@ -1,6 +1,6 @@
-import * as P                           from "purify-ts";
-import { always, Just, Maybe, Nothing } from "purify-ts";
-import * as R                           from "ramda";
+import * as P                           from 'purify-ts';
+import { always, Just, Maybe, Nothing } from 'purify-ts';
+import * as R                           from 'ramda';
 
 
 export const parseDateSafe: (s: string) => Maybe<Date> = s => P.Maybe.fromNullable(s)

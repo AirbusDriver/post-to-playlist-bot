@@ -1,13 +1,13 @@
-import { SpotifyError, SpotifyErrorNames }                                          from "@infra/spotify/errors";
-import getSpotifyLogger                                                             from "@infra/spotify/logger";
+import { SpotifyError, SpotifyErrorNames }                                          from '@infra/spotify/errors';
+import getSpotifyLogger                                                             from '@infra/spotify/logger';
 import authEvents
-                                                                                    from "@infra/spotify/tokens/authEvents";
-import { AuthTokens, CheckTokensEveryTask, FetchAuthTokensTask, RefreshTokensTask } from "@infra/spotify/tokens/types";
-import { always, Either, EitherAsync, Left, Right }                                 from "purify-ts";
-import * as R                                                                       from "ramda";
+    from '@infra/spotify/tokens/authEvents';
+import { AuthTokens, CheckTokensEveryTask, FetchAuthTokensTask, RefreshTokensTask } from '@infra/spotify/tokens/types';
+import { always, Either, EitherAsync, Left, Right }                                 from 'purify-ts';
+import * as R                                                                       from 'ramda';
 
 
-const logger = getSpotifyLogger().child({module: "autoTokens"});
+const logger = getSpotifyLogger().child({module: 'autoTokens'});
 
 const validateMilli: (x: number) => Either<string, number> = R.ifElse(
     R.allPass([
@@ -16,7 +16,7 @@ const validateMilli: (x: number) => Either<string, number> = R.ifElse(
         R.lte(999), // milli must be gte 1000
     ]),
     Right,
-    always(Left("milliseconds must be a number of at least 1000")));
+    always(Left('milliseconds must be a number of at least 1000')));
 
 
 const refreshRequiredPure = (ifWithinMilli: number) => (now: Date) => (tokens: AuthTokens): boolean => {
@@ -33,20 +33,20 @@ type TimerTask = EitherAsync<SpotifyError, void>
 export const timerTask = (fetch: FetchAuthTokensTask) => (refresh: RefreshTokensTask): TimerTask => EitherAsync(async ctx => {
     const tokens = await ctx.fromPromise(fetch.run());
 
-    logger.debug("checking tokens");
+    logger.debug('checking tokens');
 
     const required: boolean = refreshRequiredPure(1000 * 60 * 5)(new Date(Date.now()))(tokens);
 
     if (!required) {
-        logger.debug({status: "token refresh not required...", expire: tokens.expiresAt, now: new Date(Date.now())});
+        logger.debug({status: 'token refresh not required...', expire: tokens.expiresAt, now: new Date(Date.now())});
         return;
     }
 
-    logger.info("attempting to refresh tokens");
+    logger.info('attempting to refresh tokens');
 
     const result = await refresh
-        .ifRight(() => authEvents.emit("tokensRefreshed"))
-        .ifLeft(err => authEvents.emit("tokenRefreshFailed", err))
+        .ifRight(() => authEvents.emit('tokensRefreshed'))
+        .ifLeft(err => authEvents.emit('tokenRefreshFailed', err))
         .run();
 
     logger.debug(`refresh result => ${ result.inspect() }`);

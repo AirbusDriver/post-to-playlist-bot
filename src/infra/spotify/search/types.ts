@@ -1,4 +1,4 @@
-import { SpotifyTrackSearchResponse } from './spotifyCodecs';
+import { SpotifyTrackSearchResponse } from '../spotifyCodecs';
 
 
 export { SpotifyTrackSearchResponse };

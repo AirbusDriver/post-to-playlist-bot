@@ -5,7 +5,7 @@ import { runEAsyncsWithDelaySeq }                                               
 import { perSecond }                                                                        from '@fns/delay';
 import { errorFactory }                                                                     from '@infra/spotify/errors';
 import getSpotifyLogger
-                                                                                            from '@infra/spotify/logger';
+    from '@infra/spotify/logger';
 import * as P                                                                               from 'purify-ts';
 import * as R                                                                               from 'ramda';
 import SpotifyWebApi                                                                        from 'spotify-web-api-node';
@@ -18,7 +18,7 @@ import { SpotifyTrackItemCache }                                                
 
 const logger = getSpotifyLogger().child({module: 'spotify/search/searchForManyTracks'});
 
-const DELAY = perSecond(6);
+const DELAY = perSecond(10);
 
 
 type SearchForManyTracksDtoCodec = P.Codec<P.FromType<SearchForManyTracksDto>>;

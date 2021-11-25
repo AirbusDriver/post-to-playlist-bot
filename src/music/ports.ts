@@ -1,8 +1,8 @@
-import { SpotifyItem, TrackInfo } from '@/music/types';
-import { SpotifyError }           from '@infra/spotify';
-import { QueryParams }            from '@infra/spotify/search/searchForTrack.root';
-import * as P                     from 'purify-ts';
-import { EitherAsync }            from 'purify-ts';
+import { SpotifyItem, SpotifyPlaylistInfo, TrackInfo } from '@/music/types';
+import { SpotifyError }                                from '@infra/spotify';
+import { QueryParams }                                 from '@infra/spotify/search/searchForTrack.root';
+import * as P                                          from 'purify-ts';
+import { EitherAsync }                                 from 'purify-ts';
 
 
 export type SearchTrackDTO = { track: TrackInfo, params?: QueryParams }
@@ -21,4 +21,12 @@ export type SearchForManyTracksTask = (dto: SearchForManyTracksDto) => P.EitherA
 export interface SearchService {
     searchForTrack: SearchForTrackCommandTask;
     searchForManyTracks: SearchForManyTracksTask;
+}
+
+
+export type GetPlaylistByName = (name: string) => EitherAsync<SpotifyError, SpotifyPlaylistInfo | null>
+
+
+export interface PlaylistService {
+    getPlaylistByName: GetPlaylistByName;
 }

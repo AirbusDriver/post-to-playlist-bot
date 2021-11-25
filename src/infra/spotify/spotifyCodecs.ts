@@ -1,5 +1,5 @@
-import { spotifyWebApiCodecFactory } from "@infra/spotify/spotifyWebApiUtils";
-import * as P                        from "purify-ts";
+import { spotifyWebApiCodecFactory } from '@infra/spotify/spotifyWebApiUtils';
+import * as P                        from 'purify-ts';
 
 //// Raw Web API Response Codecs ////
 
@@ -14,7 +14,6 @@ import * as P                        from "purify-ts";
  */
 const spotifySearchListingCodec = P.Codec.interface({
     href: P.string,
-    items: P.array(P.unknown),
     limit: P.number,
     next: P.nullable(P.string),
     offset: P.number,
@@ -26,16 +25,17 @@ const spotifySearchListingCodec = P.Codec.interface({
 // Items //
 
 enum ItemType {
-    track = "track",
-    album = "album",
-    artist = "artist"
+    track = 'track',
+    album = 'album',
+    artist = 'artist',
+    playlist = 'playlist',
 }
 
 
 const itemTypeCodec = P.enumeration(ItemType);
 
-/** base item codec */
-const baseSearchItem = P.Codec.interface({
+/** base item codec for all listings in the result of a search */
+const baseListItem = P.Codec.interface({
     external_urls: P.Codec.interface({
         spotify: P.optional(P.string)
     }),
@@ -46,16 +46,18 @@ const baseSearchItem = P.Codec.interface({
     name: P.string,
 });
 
+export type BaseListItem = P.GetType<typeof baseListItem>
+
 
 const spotifyTrackArtistItemCodec = P.intersect(
-    baseSearchItem,
+    baseListItem,
     P.Codec.interface({
         href: P.string
     })
 );
 
 const spotifyAlbumItemCodec = P.intersect(
-    baseSearchItem,
+    baseListItem,
     P.Codec.interface({
         artists: P.array(spotifyTrackArtistItemCodec),
         release_date: P.string,
@@ -63,7 +65,7 @@ const spotifyAlbumItemCodec = P.intersect(
 );
 
 export const spotifyTrackItemCodec = P.intersect(
-    baseSearchItem,
+    baseListItem,
     P.Codec.interface({
         album: spotifyAlbumItemCodec,
         artists: P.array(spotifyTrackArtistItemCodec),
@@ -86,6 +88,28 @@ const spotifyTrackSearchResponseCodec = P.Codec.interface({
 });
 
 
+export const spotifyPlaylistSummaryItemCodec = P.intersect(
+    baseListItem,
+    P.Codec.interface({
+        description: P.string,
+        tracks: P.Codec.interface({
+            href: P.string,
+            total: P.number,
+        })
+    }));
+
+
+export type SpotifyPlaylistSummaryItem = P.GetType<typeof spotifyPlaylistSummaryItemCodec>
+
+
+// result of /me/playlists
+const spotifyPlaylistSearchResponse = P.intersect(
+    spotifySearchListingCodec,
+    P.Codec.interface({
+        items: P.array(spotifyPlaylistSummaryItemCodec)
+    })
+);
+
 //// SpotifyWebApi Codecs ////
 
 /**
@@ -97,3 +121,7 @@ const spotifyTrackSearchResponseCodec = P.Codec.interface({
 export const spotifyApiTrackSearchResponseCodec = spotifyWebApiCodecFactory(spotifyTrackSearchResponseCodec);
 
 export type SpotifyTrackSearchResponse = P.GetType<typeof spotifyApiTrackSearchResponseCodec>
+
+export const spotifyApiGetMyPlaylistsResponseCodec = spotifyWebApiCodecFactory(spotifyPlaylistSearchResponse);
+
+export type SpotifyGetMyPlaylistResponse = P.GetType<typeof spotifyApiGetMyPlaylistsResponseCodec>

@@ -1,8 +1,8 @@
-import getRootLogger, { Logger } from "@shared/logger";
+import getRootLogger, { Logger } from '@shared/logger';
 
 
 export const logger = getRootLogger().child({
-    module: "Spotify",
+    module: 'Spotify',
 });
 
 export const getSpotifyLogger = () => logger;

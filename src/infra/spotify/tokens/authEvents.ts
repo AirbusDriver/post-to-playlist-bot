@@ -1,7 +1,7 @@
-import { SpotifyError }  from "@infra/spotify/errors";
-import { AuthTokens }    from "@infra/spotify/tokens/types";
-import EventEmitter      from "events";
-import TypedEventEmitter from "typed-emitter";
+import { SpotifyError }  from '@infra/spotify/errors';
+import { AuthTokens }    from '@infra/spotify/tokens/types';
+import EventEmitter      from 'events';
+import TypedEventEmitter from 'typed-emitter';
 
 
 type SpotifyAuthEvents = {
@@ -14,5 +14,5 @@ type SpotifyAuthEvents = {
 
 export const spotifyAuthEventEmitter = new EventEmitter() as TypedEventEmitter<SpotifyAuthEvents>;
 
-export default spotifyAuthEventEmitter
+export default spotifyAuthEventEmitter;
 

@@ -1,6 +1,6 @@
-import { CodecError } from "@shared/errors";
-import * as P         from "purify-ts";
-import { Codec }      from "purify-ts";
+import { CodecError } from '@shared/errors';
+import * as P         from 'purify-ts';
+import { Codec }      from 'purify-ts';
 
 
 export type JsonTransform = (this: any, key: any, value: any) => any;
@@ -26,10 +26,10 @@ export const parseJsonWithCodec: ParseJsonWithCodec = <T>(ctx: {
     codec: Codec<T>,
     reviver?: JsonTransform,
 }) => str =>
-    P.Right(str)
-        .chain((parseJsonSafe(ctx.reviver)))
-        .chain(
-            v => ctx.codec.decode(v)
-                .mapLeft(CodecError.fromErrorString)
-        );
+        P.Right(str)
+            .chain((parseJsonSafe(ctx.reviver)))
+            .chain(
+                v => ctx.codec.decode(v)
+                    .mapLeft(CodecError.fromErrorString)
+            );
 

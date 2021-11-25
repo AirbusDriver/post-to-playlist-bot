@@ -1,8 +1,8 @@
-import { getRootLogger, Logger } from "@shared/logger";
-import cors                      from "cors";
-import express                   from "express";
-import { EitherAsync }           from "purify-ts";
-import { apiRouterFactory }      from "./infra/http";
+import { getRootLogger, Logger } from '@shared/logger';
+import cors                      from 'cors';
+import express                   from 'express';
+import { EitherAsync }           from 'purify-ts';
+import { apiRouterFactory }      from './infra/http';
 
 
 declare global {
@@ -19,7 +19,7 @@ declare global {
 const appFactory = EitherAsync(async ctx => {
 
     const app = express();
-    const logger = getRootLogger().child({module: "server"});
+    const logger = getRootLogger().child({module: 'server'});
 
     app.use(cors());
 
@@ -32,16 +32,16 @@ const appFactory = EitherAsync(async ctx => {
     });
 
     const api = await ctx.fromPromise(apiRouterFactory.run());
-    logger.debug("mounting api router");
+    logger.debug('mounting api router');
 
-    app.use("/api", api);
+    app.use('/api', api);
 
-    app.all("*", (req, res) => {
-        res.status(404).send("invalid url");
+    app.all('*', (req, res) => {
+        res.status(404).send('invalid url');
     });
 
     return app;
 });
 
 
-appFactory.map(app => app.listen(5550, () => console.log("server started on port 5550"))).ifLeft(console.error).run();
+appFactory.map(app => app.listen(5550, () => console.log('server started on port 5550'))).ifLeft(console.error).run();

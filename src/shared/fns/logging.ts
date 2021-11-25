@@ -20,4 +20,4 @@ export const noOpLogger: Logger = {
     trace: noOp
 };
 
-export const consoleLogger: Logger = console
+export const consoleLogger: Logger = console;

@@ -20,11 +20,11 @@
  * affecting the type signatures of the tasks
  *
  */
-import { EitherAsync }          from "@/shared/fns";
-import { FetchAuthTokensTask }  from "@infra/spotify/tokens";
-import SpotifyWebApi            from "spotify-web-api-node";
-import { GetSpotifyConfigSafe } from "./config";
-import { SpotifyError }         from "./errors";
+import { EitherAsync }          from '@/shared/fns';
+import { FetchAuthTokensTask }  from '@infra/spotify/tokens';
+import SpotifyWebApi            from 'spotify-web-api-node';
+import { GetSpotifyConfigSafe } from './config';
+import { SpotifyError }         from './errors';
 
 
 /**
