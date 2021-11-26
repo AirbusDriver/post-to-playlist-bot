@@ -1,6 +1,7 @@
-import { spotifyTrackEq } from '@/music/tracks';
-import { SpotifyTrack }   from '@/music/types';
-import * as R             from 'ramda';
+import { SearchSongPostsDto }               from '@/music/useCases/searchForSongPosts';
+import { spotifyTrackEq }                   from '@/music/tracks';
+import { PlaylistDefinition, SpotifyTrack } from '@/music/types';
+import * as R                               from 'ramda';
 
 
 enum PlaylistTrackAction {
@@ -35,4 +36,24 @@ export const getActions = (playlistTracks: SpotifyTrack[]) => (results: SpotifyT
         R.assoc(PlaylistTrackAction.REMAIN, getRemainTracks(playlistTracks)(results)),
         R.assoc(PlaylistTrackAction.REMOVE, getRemoveTracks(playlistTracks)(results))
     )({});
+};
+
+
+export const playlistSourceToSearchDto = (rule: PlaylistDefinition['rules']['sources'][0]): SearchSongPostsDto => {
+
+    switch (rule.rule.type) {
+    case 'top':
+        return {
+            type: rule.rule.type,
+            limit: rule.rule.number,
+            subreddit: rule.subreddit,
+            time: rule.rule.timeframe
+        };
+    default :
+        return {
+            type: rule.rule.type,
+            limit: rule.rule.number,
+            subreddit: rule.subreddit,
+        };
+    }
 };

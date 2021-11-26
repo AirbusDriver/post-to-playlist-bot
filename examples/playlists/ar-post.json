@@ -1,0 +1,40 @@
+{
+  "id": "3SsA4mwMcKnldtDlLaGZ9O",
+  "description": "Post-hardcore playlist dynamically created from posts on the r/posthardcore and r/melodichardcore subreddits",
+  "name": "ar/post",
+  "rules": {
+    "rate": "daily",
+    "sources": [
+      {
+        "subreddit": "posthardcore",
+        "rule": {
+          "type": "top",
+          "timeframe": "week",
+          "number": 15
+        }
+      },
+      {
+        "subreddit": "posthardcore",
+        "rule": {
+          "type": "hot",
+          "number": 10
+        }
+      },
+      {
+        "subreddit": "melodichardcore",
+        "rule": {
+          "type": "top",
+          "timeframe": "week",
+          "number": 15
+        }
+      },
+      {
+        "subreddit": "melodichardcore",
+        "rule": {
+          "type": "hot",
+          "number": 10
+        }
+      }
+    ]
+  }
+}

@@ -31,6 +31,7 @@ const timedCollectionRuleCodec: TimedCollectionRuleCode = P.Codec.interface({
 
 type PlaylistDefinitionCodec = P.Codec<P.FromType<PlaylistDefinition>>
 export const playlistDefinitionCodec: PlaylistDefinitionCodec = P.Codec.interface({
+    id: P.string,
     name: P.string,
     description: P.string,
     rules: P.Codec.interface({

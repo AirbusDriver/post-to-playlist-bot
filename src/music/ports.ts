@@ -1,4 +1,7 @@
 import { SpotifyItem, SpotifyPlaylistInfo, TrackInfo } from '@/music/types';
+import { RedditError }                                 from '@infra/reddit/errors';
+import { GetSongPostsTask }                            from '@infra/reddit/songPosts/getSongPostsFromSubreddit.root';
+import { TrackSubmissionSummary }                      from '@infra/reddit/types';
 import { SpotifyError }                                from '@infra/spotify';
 import { QueryParams }                                 from '@infra/spotify/search/searchForTrack.root';
 import * as P                                          from 'purify-ts';
@@ -24,9 +27,14 @@ export interface SearchService {
 }
 
 
-export type GetPlaylistByName = (name: string) => EitherAsync<SpotifyError, SpotifyPlaylistInfo | null>
+export interface SongPostsService {
+    getSongPostsTask: GetSongPostsTask;
+}
+
+
+export type SearchForPlaylistById = (id: string) => EitherAsync<SpotifyError, SpotifyPlaylistInfo | null>
 
 
 export interface PlaylistService {
-    getPlaylistByName: GetPlaylistByName;
+    searchForPlaylistById: SearchForPlaylistById;
 }

@@ -1,82 +1,52 @@
-import { getActions }                                              from '@/music/playlists';
-import { searchForSongPostsRoot, SearchSongPostsDto }              from '@/music/searchForSongPosts.root';
+import { searchForSongPostsRoot }                                  from '@/music/searchForSongPosts.root';
+import { readFileSyncSafe }                                        from '@fns/fileIO';
+import { parseJsonSafe }                                           from '@fns/json';
+import { getClient }                                               from '@infra/reddit';
 import { getSongPostsFromSubredditTaskRoot }                       from '@infra/reddit/songPosts/index';
 import { createSearchServiceFromClient, getAuthorizedClientCache } from '@infra/spotify';
-import { searchUserPlaylistsWithRoot }                             from '@infra/spotify/playlists/searchUserPlaylists';
-import { mapSpotifyErrorResponseToSpotifyError }                   from '@infra/spotify/spotifyWebApiUtils';
+import { searchUserPlaylistById }                                  from '@infra/spotify/playlists/searchUserPlaylists';
 import { liftEA }                                                  from '@shared/fns';
-import * as P                                                      from 'purify-ts';
-import { EitherAsync, Maybe }                                      from 'purify-ts';
-import * as R                                                      from 'ramda';
-import { getClient }                                               from '../src/infra/reddit';
+import * as path                                                   from 'path';
+import { EitherAsync }                                             from 'purify-ts';
+import { syncPlaylistTaskRoot }                                    from '../src/music/useCases/syncPlaylist';
+import { createCommand }                                           from 'commander';
 
 
-const NAME = 'ar/heavy';
+const parse = () => {
+    const prog = createCommand('sync-playlist')
+        .requiredOption('-p', '--path <path>', 'path to playlist file');
 
-const detailsBlurb = () => (
-    'A dynamic playlist made from the current posts on r/hardcore, r/revivalcore, & r/deathcore. Last updated at ' +
-    `${ new Date(Date.now()).toLocaleString() }`
-);
+    return prog.parse(process.argv).opts();
+};
 
 
-const rules: SearchSongPostsDto[] = [
-    {type: 'hot', limit: 10, subreddit: 'deathcore'},
-    {type: 'top', limit: 5, time: 'week', subreddit: 'deathcore'},
-    {type: 'hot', limit: 10, subreddit: 'revivalcore'},
-    {type: 'top', limit: 5, time: 'week', subreddit: 'revivalcore'},
-    {type: 'hot', limit: 10, subreddit: 'hardcore'},
-    {type: 'top', limit: 5, time: 'week', subreddit: 'hardcore'},
-];
+const playlistPath = path.resolve(__dirname, 'playlists', 'ar-heavy.json');
 
 const prog = EitherAsync(async ctx => {
 
     const client = await ctx.fromPromise(getAuthorizedClientCache.getLazy());
     const redditClient = await ctx.liftEither(getClient());
 
-    const playlist = await ctx.fromPromise(searchUserPlaylistsWithRoot({client})(R.propEq('name', NAME))
-        .chain(x => liftEA(Maybe.fromNullable(x).toEither('no playlist for id')))
-        .run());
-
     const songPostsSearch = searchForSongPostsRoot({
         spotifySearch: createSearchServiceFromClient(client),
         getSongPosts: getSongPostsFromSubredditTaskRoot(redditClient)
     });
 
-
-    const playlistActions = await ctx.fromPromise(
-        EitherAsync.sequence(rules.map(songPostsSearch))
-            .map(R.flatten)
-            .map(R.map(p => p.spotify))
-            .map(getActions(playlist.item.tracks))
-            .run()
-    );
+    const syncer = syncPlaylistTaskRoot({
+        client,
+        searchSongPosts: songPostsSearch,
+        searchForPlaylist: searchUserPlaylistById({client})
+    });
 
 
-    const clientTasks = [
-        EitherAsync(async () =>
-            P.NonEmptyList.fromArray(playlistActions.ADD.map(r => r.uri))
-                .map(async tracks => await client.addTracksToPlaylist(playlist.id, tracks))
-                .ifJust(() => console.log(`added ${ playlistActions.ADD.length } tracks to ${ NAME }`)))
-            .void()
-            .mapLeft(mapSpotifyErrorResponseToSpotifyError),
+    await liftEA(readFileSyncSafe(playlistPath)()
+        .chain<Error, any>(parseJsonSafe()))
+        .chain(syncer)
+        .ifRight(console.log)
+        .run();
 
-        EitherAsync(async () =>
-            P.NonEmptyList.fromArray(playlistActions.REMOVE.map(r => ({uri: r.uri})))
-                .map(async tracks => await client.removeTracksFromPlaylist(playlist.id, tracks))
-                .ifJust(() => console.log(`removed ${ playlistActions.REMOVE.length } tracks from ${ NAME }`)))
-            .void()
-            .mapLeft(mapSpotifyErrorResponseToSpotifyError),
-
-        EitherAsync(async () => client.changePlaylistDetails(playlist.id, {
-            description: detailsBlurb()
-        }))
-            .ifRight(_ => console.log('updated description'))
-            .void()
-    ];
-
-    await EitherAsync.sequence(clientTasks).run();
 
 });
 
 
-prog.bimap(console.error, console.log).run();
+prog.bimap(console.error, console.log).run().then(() => process.exit());

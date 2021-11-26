@@ -12,14 +12,15 @@ top 10 songs in the playlist, while keeping the current "hot 50" song in step wi
 
 - [ ] `Music` module commands and service implementation
     - [x] `/api/music/song-posts` vertical slice
-    - [ ] `/api/music/track-locations/:tracks[]` endpoint
+    - [x] `/api/music/track-locations/:tracks[]` endpoint
         - [ ] `/music/service`
-            - [ ] `/music/service/trackLocations.command`
+            - [x] `/music/service/trackLocations.syncPlaylistCommand`
     - [x] `/api/music/*` caching
 - [ ] Express server scheduling
 - [ ] CLI
+    - Music module cli
+        - [x] Sync playlists dir/*.json to sync all playlists in directory
 - [ ] Email/Notification service
-- [ ] Yaml parsing
 - [ ] UI
     - [ ] Config editing via UI
     - [ ] Log reading
@@ -44,7 +45,7 @@ More examples can be found in the src/examples folder
 ```typescript
 
 import {
-    searchForSongPostsRoot,
+    searchForSongPosts,
     Env as searchForSongEnv
 }                                            from '@/music/searchForSongPosts.controller.json';
 import { getSongPostsFromSubredditTaskRoot } from '@/infra/reddit/songPosts';
@@ -63,7 +64,7 @@ const main = P.EitherAsync(async ctx => {
     const searchService = await ctx.fromPromise(getAuthorizedClientTask.map(createSearchServiceFromClient).run());
 
     const env: searchForSongEnv = {
-        getSongPosts: songPostLookup,
+        getSongPostsFromReddit: songPostLookup,
         spotifySearch: searchService,
     };
 
@@ -72,7 +73,7 @@ const main = P.EitherAsync(async ctx => {
     const search = 'hot';
     const limit = 25;
 
-    const task = searchForSongPostsRoot(env);
+    const task = searchForSongPosts(env);
 
     return task({
         type: search,

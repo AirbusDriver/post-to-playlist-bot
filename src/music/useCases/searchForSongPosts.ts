@@ -1,11 +1,14 @@
 import { SearchForManyTracksDto, SearchService }                                       from '@/music/ports';
 import { SpotifyItem, SpotifyTrack, TrackInfo }                                        from '@/music/types';
 import { ApplicationError, ApplicationErrorNames, RawError }                           from '@/shared';
+import { getClientCache }                                                              from '@infra/reddit';
 import {
     GetSongPostsDto,
+    getSongPostsFromSubredditTaskRoot,
     GetSongPostsTask
 }                                                                                      from '@infra/reddit/songPosts/getSongPostsFromSubreddit.root';
 import { ListingTimes, NonTimeFrameListing, TimeFrameListing, TrackSubmissionSummary } from '@infra/reddit/types';
+import { getSearchServiceTask }                                                        from '@infra/spotify/adapters/searchService';
 import getLogger                                                                       from '@shared/logger';
 import * as P                                                                          from 'purify-ts';
 import { EitherAsync, Right }                                                          from 'purify-ts';
@@ -84,10 +87,10 @@ export type SearchForSongPostsTask = (dto: SearchSongPostsDto) => EitherAsync<Se
 
 export type Env = {
     spotifySearch: SearchService;
-    getSongPosts: GetSongPostsTask;  // todo: move to a port. this dependency is pointing the wrong way
+    getSongPostsFromReddit: GetSongPostsTask;  // todo: move to a port. this dependency is pointing the wrong way
 }
 
-export const searchForSongPostsRoot = (env: Env): SearchForSongPostsTask => {
+export const searchForSongPosts = (env: Env): SearchForSongPostsTask => {
     return dto => EitherAsync(async ctx => {
 
         const validDto = await ctx.liftEither(
@@ -132,13 +135,13 @@ export const searchForSongPostsRoot = (env: Env): SearchForSongPostsTask => {
 
             const deDupedAccum = R.uniqBy(([ _, spot ]) => spot != null, acc);
 
-            const trackPosts = await ctx.fromPromise(env.getSongPosts(nextGetSongsDto)
+            const trackPosts = await ctx.fromPromise(env.getSongPostsFromReddit(nextGetSongsDto)
                 .mapLeft<SearchSongPostsError>(err => ({
                     name: SearchSongPostsErrorReasons.SERVICE_ERROR,
                     message: 'could not reach song post search service',
                     orig: err.orig
                 }))
-                .ifLeft(_ => logger.debug('getSongPosts service failed'))
+                .ifLeft(_ => logger.debug('getSongPosts service failed during recursive search'))
                 .ifLeft(logger.error)
                 .run());
 
@@ -181,6 +184,8 @@ export const searchForSongPostsRoot = (env: Env): SearchForSongPostsTask => {
             opts,
         });
 
+        logger.info(`searching ${ validDto.subreddit } for tracks`);
+
         const temp = await recurse(maxDepth, chunk, validDto.limit, initialSearchDto, []);
 
         const items: ItemDetails[] = temp
@@ -205,3 +210,23 @@ export const searchForSongPostsRoot = (env: Env): SearchForSongPostsTask => {
 };
 
 
+export const searchForSongPostsUseCase: SearchForSongPostsTask = dto => {
+    return EitherAsync(async lifts => {
+        const snoo = await lifts.liftEither(getClientCache.getLazy());
+        const searchService = await lifts.fromPromise(getSearchServiceTask.run());
+
+        return searchForSongPosts({
+            getSongPostsFromReddit: getSongPostsFromSubredditTaskRoot(snoo),
+            spotifySearch: searchService,
+        });
+    })
+        .mapLeft(err => ({
+            name: ApplicationErrorNames.CONFIG,
+            orig: err,
+            message: 'could not lost dependencies for searchForSongPosts'
+        }))
+        .chain(fn => fn(dto));
+};
+
+
+export default searchForSongPostsUseCase;

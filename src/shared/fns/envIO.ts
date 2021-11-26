@@ -25,6 +25,8 @@ export const getEnvOrThrowIO: GetEnvOrThrowIO = (err?) => () =>
                 });
         })
         .extract() as typeof process.env;
+
+// todo: move this out to it's own helper file. It isn't env specific
 /**
  * Return a Record(string, string) with the keys remapped from a keyMap and the values
  * from the original record. This is useful for renaming possible keys from an env and

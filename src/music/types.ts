@@ -46,7 +46,7 @@ export type TrendingCollectionRule = {
 type TrackCollectionRule = TimedCollectionRule | TrendingCollectionRule;
 
 // A subreddit can be the source of both hot 10 and top 10 - all for example
-type SubredditRule = {
+export type SubredditRule = {
     subreddit: string;
     rule: TrackCollectionRule
 }
@@ -64,6 +64,7 @@ export type TrackSearchResults = {
 
 // a user defined playlist definition
 export type PlaylistDefinition = {
+    id: string,
     name: string;
     description: string;
     rules: {

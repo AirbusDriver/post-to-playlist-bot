@@ -33,7 +33,7 @@ export const responseErrorToSpotifyError: (err: SpotifyErrorResponse) => Spotify
         .extract();
 };
 
-const createError:
+export const createError:
     (name: SpotifyErrorNames) => <T>(message: string, orig?: T) => SpotifyError =
     name => (message, orig?) => ({
         message,
@@ -42,6 +42,7 @@ const createError:
     });
 
 
+// todo: move to fns
 export const errorFactory = {
     runtime: createError(SpotifyErrorNames.RUNTIME),
     auth: createError(SpotifyErrorNames.AUTH),

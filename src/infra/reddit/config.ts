@@ -5,6 +5,10 @@ import * as R                              from 'ramda';
 import { redditConfigCodec }               from './codecs';
 import { RedditError, redditErrorFactory } from './errors';
 
+import { config } from 'dotenv';
+
+
+config();
 
 const defaults: Partial<RedditConfig> = {
     userAgent: 'BleghBot: a metalcore playlist maker',

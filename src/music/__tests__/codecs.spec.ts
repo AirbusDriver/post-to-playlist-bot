@@ -4,6 +4,7 @@ import * as R                      from 'ramda';
 
 
 const validPlaylistDefinition: PlaylistDefinition = {
+    id: '12341234',
     name: 'my playlist',
     description: 'angry music for happy people',
     rules: {

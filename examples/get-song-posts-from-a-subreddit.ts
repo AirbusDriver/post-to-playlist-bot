@@ -1,7 +1,7 @@
 import {
     searchForSongPostsRoot,
     Env as searchForSongEnv
-}                                            from '../src/music/searchForSongPosts.controller.json';
+}                                            from '@/music/searchForSongPosts.root';
 import { getSongPostsFromSubredditTaskRoot } from '@/infra/reddit/songPosts';
 import { getClient }                         from '@/infra/reddit';
 import { createSearchServiceFromClient }     from '@/infra/spotify/search';

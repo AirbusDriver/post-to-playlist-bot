@@ -1,5 +1,6 @@
 import * as P from 'purify-ts';
 
+
 // todo: remove this and its usages in favor of the primitive error string that can be wrapped up
 /**
  * An Error representing a failed Codec parse operation

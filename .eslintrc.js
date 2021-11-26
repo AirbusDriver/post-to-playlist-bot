@@ -20,19 +20,19 @@ module.exports = {
     ],
     'rules': {
         'indent': [
-            'error',
+            'warn',
             4
         ],
         'linebreak-style': [
-            'error',
+            'warn',
             'unix'
         ],
         'quotes': [
-            'error',
+            'warn',
             'single'
         ],
         'semi': [
-            'error',
+            'warn',
             'always'
         ],
         '@typescript-eslint/no-unused-vars': [

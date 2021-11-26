@@ -1,0 +1,151 @@
+{
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "description": {
+      "type": "string"
+    },
+    "rules": {
+      "type": "object",
+      "properties": {
+        "rate": {
+          "oneOf": [
+            {
+              "type": "string",
+              "enum": [
+                "daily"
+              ]
+            },
+            {
+              "type": "string",
+              "enum": [
+                "weekly"
+              ]
+            },
+            {
+              "type": "string",
+              "enum": [
+                "monthly"
+              ]
+            }
+          ]
+        },
+        "sources": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "subreddit": {
+                "type": "string"
+              },
+              "rule": {
+                "oneOf": [
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "type": "string",
+                        "enum": [
+                          "top"
+                        ]
+                      },
+                      "number": {
+                        "type": "number"
+                      },
+                      "timeframe": {
+                        "oneOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "all"
+                            ]
+                          },
+                          {
+                            "type": "string",
+                            "enum": [
+                              "year"
+                            ]
+                          },
+                          {
+                            "type": "string",
+                            "enum": [
+                              "month"
+                            ]
+                          },
+                          {
+                            "type": "string",
+                            "enum": [
+                              "week"
+                            ]
+                          }
+                        ]
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "number",
+                      "timeframe"
+                    ]
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "type": {
+                        "oneOf": [
+                          {
+                            "type": "string",
+                            "enum": [
+                              "hot"
+                            ]
+                          },
+                          {
+                            "type": "string",
+                            "enum": [
+                              "new"
+                            ]
+                          },
+                          {
+                            "type": "string",
+                            "enum": [
+                              "rising"
+                            ]
+                          }
+                        ]
+                      },
+                      "number": {
+                        "type": "number"
+                      }
+                    },
+                    "required": [
+                      "type",
+                      "number"
+                    ]
+                  }
+                ]
+              }
+            },
+            "required": [
+              "subreddit",
+              "rule"
+            ]
+          }
+        }
+      },
+      "required": [
+        "rate",
+        "sources"
+      ]
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "description",
+    "rules"
+  ]
+}

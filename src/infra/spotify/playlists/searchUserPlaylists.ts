@@ -1,9 +1,12 @@
+import { SearchForPlaylistById }                                             from '@/music/ports';
 import { SpotifyPlaylistInfo, SpotifyTrack }                                 from '@/music/types';
 import { errorFactory, SpotifyError }                                        from '@infra/spotify/errors';
 import { spotifyApiGetMyPlaylistsResponseCodec, SpotifyPlaylistSummaryItem } from '@infra/spotify/spotifyCodecs';
 import { mapSpotifyErrorResponseToSpotifyError }                             from '@infra/spotify/spotifyWebApiUtils';
 import { EitherAsync }                                                       from 'purify-ts';
 import SpotifyWebApi                                                         from 'spotify-web-api-node';
+import * as P                                                                from 'purify-ts';
+import * as R                                                                from 'ramda';
 
 
 type SearchUserPlaylistsEnv = {
@@ -85,13 +88,20 @@ const getTracks = (client: SpotifyWebApi, playlistItem: SpotifyPlaylistSummaryIt
 });
 
 
-export const searchUserPlaylistsWithRoot = (env: SearchUserPlaylistsEnv) => (checker: PlaylistItemIsResult) => EitherAsync(async lifts => {
+export const searchUserPlaylistsWithRoot = (env: SearchUserPlaylistsEnv) => (checker: PlaylistItemIsResult) =>
+    EitherAsync<SpotifyError, SpotifyPlaylistInfo | null>(async lifts => {
 
-    const playlistResultItem = await lifts.fromPromise(getUserPlaylistsSummaries(env.client, checker).run());
+        const playlistResultItem = await lifts.fromPromise(
+            getUserPlaylistsSummaries(env.client, checker)
+                .run());
 
-    if (playlistResultItem == null) {
-        return null;
-    }
+        if (playlistResultItem == null) {
+            return null;
+        }
 
-    return lifts.fromPromise(getTracks(env.client, playlistResultItem).run());
-});
+        return lifts.fromPromise(getTracks(env.client, playlistResultItem).run());
+    });
+
+export const searchUserPlaylistById: (env: SearchUserPlaylistsEnv) => SearchForPlaylistById = env => id => {
+    return searchUserPlaylistsWithRoot(env)(R.propEq('id', id));
+};

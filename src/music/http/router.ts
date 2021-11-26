@@ -26,7 +26,7 @@ export const musicRouterFactoryTask = EitherAsync<any, Router>(async ctx => {
     router.get('/song-posts',
         searchSongPostJsonController(searchForSongPostsRoot({
             spotifySearch: searchService,
-            getSongPosts: getSongPostsFromSubredditTaskRoot(redditClient)
+            getSongPostsFromReddit: getSongPostsFromSubredditTaskRoot(redditClient)
         })));
 
     router.post('/search/tracks', searchForManyTracksControllerJson(searchService));
@@ -34,7 +34,7 @@ export const musicRouterFactoryTask = EitherAsync<any, Router>(async ctx => {
     router.get('/search/tracks', searchForSingleTrackControllerJson(searchService));
 
     return router;
-    
+
 });
 
 export default musicRouterFactoryTask;
