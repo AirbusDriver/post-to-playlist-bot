@@ -26,7 +26,124 @@ top 10 songs in the playlist, while keeping the current "hot 50" song in step wi
     - [ ] Log reading
     - [ ] OAuth2 support for Spotify and Reddit via UI
 
-## Usage
+## Deployment
+
+There are currently two ways to deploy a bot of your own. Git clone or Docker pull. I recommend the Docker route.
+Regardless of how you get the app, you'll need to have both a registered Reddit script app, and a registered Spotify
+app.
+
+1) Make some directory to hold your bot info
+
+```shell
+mkdir ~/thrash-bot
+```
+
+2) Create an env file based on `.env.sample` from the repo.
+
+```shell
+
+## ~/thrash-bot/thrashBotEnv
+
+REDDIT_SECRET=my_reddit_secret
+REDDIT_CLIENT_ID=my_client_id
+REDDIT_USER_AGENT=METAL BOT
+REDDIT_USERNAME=my_username
+REDDIT_PASSWORD=my_password
+
+PORT=42069 # ayyyy
+
+
+SPOTIFY_CLIENT_ID=some_client_id
+SPOTIFY_SECRET=some_client_secret
+SPOTIFY_CREDS_FILE=/var/reddit-dj/testCreds.json
+SPOTIFY_CODE_FILE=/var/reddit-dj/authCode.txt
+
+```
+
+3) Go to your Reddit account's third party app settings and create a new bot of the "script" type. You will receive a
+   client id and a client secret. Fill out the `REDDIT_` keys with these new. If you already have a registered script
+   bot, you can just use that.
+
+4) Go to https://developer.spotify.com and create an app there. Do the same thing with those keys
+
+5) Now get pull the image from Dockerhub
+
+```shell
+docker pull ajtruant/reddit-dj-bot:latest
+```
+
+6) Now, let's make a playlist on Spotify like you usually would. Maybe call it "REE REE REEREEREE"
+
+7) Now let's fill that baby up with deathcore goodness. `mkdir ~/thrash-bot/playlists`
+
+`> ~/thrash-bot/playlists/pigGrunt.json`
+
+```json5
+{
+  "id": "her749349437",
+  // whatever your id is from your playlist,
+  "name": "REE REE REEREEREE",
+  "description": "whatever r/deathcore is up to this week",
+  "rules": {
+    "rate": "daily",
+    // this is broken but do it anyway,
+    "sources": [
+      {
+        "subreddit": "deathcore",
+        "rule": {
+          "type": "top",
+          "number": 15,
+          "timeframe": "week"
+        }
+      },
+      {
+        "subreddit": "deathcore",
+        "rule": {
+          "type": "hot",
+          // no timeframe for "hot" searches
+          "number": 10
+        }
+      }
+    ]
+  }
+}
+
+```
+
+8) Now... Spotify requires Oath2. So that gets complicated with a CLI based bot. Don't bite your lip ring off, I took
+   care of that. But you'll want to pay attention if you aren't used to Docker.
+
+```shell
+docker run --rm 
+--env-file ~/thrash-bot/thrashBotEnv \
+--mount type=bind,src="~/thrash-bot",dst="/etc/reddit-dj" \
+-it reddit-dj-bot \
+npm run get-spotify-tokens
+```
+
+**IMPORTANT** we're throwing this away with the `--rm` flag. As soon as we finish our token flow we want to start over.
+
+This will take you through a workflow to get your oath tokens and store them in your `~/thrash-bot` directory
+
+9) Now we run the jobs.
+
+```shell
+docker run \
+--env-file ~/thrash-bot/thrashBotEnv \
+--name thrash-bot 
+--mount type=bind,src="~/thrash-bot",dst="/etc/reddit-dj" \
+-d reddit-dj-bot \
+npm run get-spotify-tokens
+```
+
+You can use whatever you want for the `--name` flag. Also the `-d` flag is optional. It just pushes it back to the
+daemon. If you aren't familiar with Docker, just omit it but you'll commit your shell to the process, which is fine if
+you're into that sorta thing.
+
+And off it goes! Currently, it will run once an hour, but some changes are coming to make this tunable. If you ran
+with `-d`, you can check in on it with `docker logs thrash-bot`.
+
+## Contributions
 
 Currently the library is being fleshed out, but this is a basic example of how the services are used under the
 hood. [Purify-ts](https://gigobyte.github.io/purify/) is used extensively as monad library and the rest of the library
@@ -51,7 +168,7 @@ import {
 import { getSongPostsFromSubredditTaskRoot } from '@/infra/reddit/songPosts';
 import { getClient }                         from '@/infra/reddit';
 import { createSearchServiceFromClient }     from '@/infra/spotify/search';
-import { getAuthorizedClientTask }           from '@/infra/spotify';
+import { _getAuthorizedClientTask }          from '@/infra/spotify';
 import { liftEA }                            from '@fns';
 import { stringifyJsonSafe }                 from '@fns/json';
 import * as P                                from 'purify-ts';
@@ -61,7 +178,7 @@ import * as R                                from 'ramda';
 const main = P.EitherAsync(async ctx => {
 
     const songPostLookup = await ctx.liftEither(getClient().ap(P.Right(getSongPostsFromSubredditTaskRoot)));
-    const searchService = await ctx.fromPromise(getAuthorizedClientTask.map(createSearchServiceFromClient).run());
+    const searchService = await ctx.fromPromise(_getAuthorizedClientTask.map(createSearchServiceFromClient).run());
 
     const env: searchForSongEnv = {
         getSongPostsFromReddit: songPostLookup,
@@ -281,7 +398,3 @@ prog.run();
  */
 
 ```
-
-## How to Contribute
-
-You don't want any part of this. I don't want any part of this. 

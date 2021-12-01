@@ -213,7 +213,7 @@ export const searchForSongPosts = (env: Env): SearchForSongPostsTask => {
 export const searchForSongPostsUseCase: SearchForSongPostsTask = dto => {
     return EitherAsync(async lifts => {
         const snoo = await lifts.liftEither(getClientCache.getLazy());
-        const searchService = await lifts.fromPromise(getSearchServiceTask.run());
+        const searchService = await lifts.fromPromise(getSearchServiceTask);
 
         return searchForSongPosts({
             getSongPostsFromReddit: getSongPostsFromSubredditTaskRoot(snoo),
@@ -225,6 +225,7 @@ export const searchForSongPostsUseCase: SearchForSongPostsTask = dto => {
             orig: err,
             message: 'could not lost dependencies for searchForSongPosts'
         }))
+        .ifLeft(console.error)
         .chain(fn => fn(dto));
 };
 

@@ -5,7 +5,7 @@ import {
 import { getSongPostsFromSubredditTaskRoot } from '@/infra/reddit/songPosts';
 import { getClient }                         from '@/infra/reddit';
 import { createSearchServiceFromClient }     from '@/infra/spotify/search';
-import { getAuthorizedClientTask }           from '@/infra/spotify';
+import { _getAuthorizedClientTask }          from '@/infra/spotify';
 import { liftEA }                            from '@fns';
 import { stringifyJsonSafe }                 from '@fns/json';
 import * as P                                from 'purify-ts';
@@ -15,7 +15,7 @@ import * as R                                from 'ramda';
 const main = P.EitherAsync(async ctx => {
 
     const songPostLookup = await ctx.liftEither(getClient().ap(P.Right(getSongPostsFromSubredditTaskRoot)));
-    const searchService = await ctx.fromPromise(getAuthorizedClientTask.map(createSearchServiceFromClient).run());
+    const searchService = await ctx.fromPromise(_getAuthorizedClientTask.map(createSearchServiceFromClient).run());
 
     const env: searchForSongEnv = {
         getSongPosts: songPostLookup,

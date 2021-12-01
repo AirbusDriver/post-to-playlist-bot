@@ -67,7 +67,6 @@ const main: WithReadlineInterfaceTaskIO<EitherAsync<any, any>> = iface => Either
     const config = await ctx.liftEither(getSpotifyConfigSafe());
 
     const client = await ctx.fromPromise(createUnauthorizedClientTask.run());
-    const authService = createAuthTokenService(client);
 
     const url = client.createAuthorizeURL(config.scopes, config.state);
 

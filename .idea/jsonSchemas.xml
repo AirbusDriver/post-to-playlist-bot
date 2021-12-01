@@ -28,16 +28,9 @@
               <option name="patterns">
                 <list>
                   <Item>
-                    <option name="path" value="src/music/schemas/playlistDefinition.schema.json" />
-                  </Item>
-                  <Item>
-                    <option name="path" value="playlists/arHeavy.json" />
-                  </Item>
-                  <Item>
-                    <option name="path" value="examples/arHeavy.json" />
-                  </Item>
-                  <Item>
-                    <option name="path" value="playlists/at-post.json" />
+                    <option name="directory" value="true" />
+                    <option name="path" value="myPlaylists" />
+                    <option name="mappingKind" value="Directory" />
                   </Item>
                 </list>
               </option>

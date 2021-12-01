@@ -1,0 +1,115 @@
+{
+  "id": "7HSzxV5SjkYMJT9oLTRtOj",
+  "name": "ar/heavy",
+  "description": "A heavy music playlist created from the top and trending posts from r/hardcore, r/metalcore, r/deathcore, and r/revivalcore",
+  "rules": {
+    "rate": "daily",
+    "sources": [
+      {
+        "subreddit": "revivalcore",
+        "rule": {
+          "type": "top",
+          "number": 10,
+          "timeframe": "week"
+        }
+      },
+      {
+        "subreddit": "revivalcore",
+        "rule": {
+          "type": "hot",
+          "number": 5
+        }
+      },
+      {
+        "subreddit": "hardcore",
+        "rule": {
+          "type": "top",
+          "number": 10,
+          "timeframe": "week"
+        }
+      },
+      {
+        "subreddit": "hardcore",
+        "rule": {
+          "type": "hot",
+          "number": 5
+        }
+      },
+      {
+        "subreddit": "deathcore",
+        "rule": {
+          "type": "top",
+          "number": 10,
+          "timeframe": "week"
+        }
+      },
+      {
+        "subreddit": "deathcore",
+        "rule": {
+          "type": "hot",
+          "number": 5
+        }
+      },
+      {
+        "subreddit": "metalcore",
+        "rule": {
+          "type": "top",
+          "number": 10,
+          "timeframe": "week"
+        }
+      },
+      {
+        "subreddit": "metalcore",
+        "rule": {
+          "type": "hot",
+          "number": 5
+        }
+      },
+      {
+        "subreddit": "posthardcore",
+        "rule": {
+          "type": "top",
+          "number": 10,
+          "timeframe": "week"
+        }
+      },
+      {
+        "subreddit": "posthardcore",
+        "rule": {
+          "type": "hot",
+          "number": 5
+        }
+      },
+      {
+        "subreddit": "melodichardcore",
+        "rule": {
+          "type": "top",
+          "number": 10,
+          "timeframe": "week"
+        }
+      },
+      {
+        "subreddit": "melodichardcore",
+        "rule": {
+          "type": "hot",
+          "number": 5
+        }
+      },
+      {
+        "subreddit": "melodicdeathmetal",
+        "rule": {
+          "type": "top",
+          "number": 10,
+          "timeframe": "week"
+        }
+      },
+      {
+        "subreddit": "melodicdeathmetal",
+        "rule": {
+          "type": "hot",
+          "number": 5
+        }
+      }
+    ]
+  }
+}

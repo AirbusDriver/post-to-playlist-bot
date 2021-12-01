@@ -33,7 +33,9 @@ export type SyncPlaylistResponse = {
 }
 
 
-export type SyncPlaylistTask = (dto: PlaylistDefinition) => EitherAsync<PlaylistError | ApplicationError, SyncPlaylistResponse>
+export type SyncPlaylistTaskDto = PlaylistDefinition;
+
+export type SyncPlaylistTask = (dto: SyncPlaylistTaskDto) => EitherAsync<PlaylistError | ApplicationError, SyncPlaylistResponse>
 
 
 export type SyncPlaylistTaskEnv = {
@@ -150,6 +152,7 @@ export const syncPlaylistUseCase: SyncPlaylistTask = dto => {
             orig: err,
             message: 'could not load dependencies for syncPlaylist'
         }))
+        .ifLeft(logger.error)
         .chain(fn => fn(dto));
 };
 

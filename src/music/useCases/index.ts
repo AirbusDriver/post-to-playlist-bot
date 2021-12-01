@@ -1,2 +1,4 @@
-import { syncPlaylistUseCase, SyncPlaylistTask, SyncPlaylistResponse, PlaylistError } from './syncPlaylist';
+export {
+    syncPlaylistUseCase, SyncPlaylistTask, SyncPlaylistResponse, PlaylistError, SyncPlaylistTaskDto
+} from './syncPlaylist';
 
