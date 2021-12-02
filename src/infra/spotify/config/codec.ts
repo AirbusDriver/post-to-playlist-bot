@@ -16,5 +16,7 @@ export const envCodec: Codec<SpotifyEnvSettings> = Codec.interface(
     {
         SPOTIFY_CLIENT_ID: P.string,
         SPOTIFY_SECRET: P.string,
+        SPOTIFY_CREDS_FILE: P.string,
+        SPOTIFY_CODE_FILE: P.string
     },
 );

@@ -1,10 +1,8 @@
-import { SearchForSongPostsTask, SearchSongPostsDto }         from '@/music/searchForSongPosts.root';
+import { SearchForSongPostsTask }                             from '@/music/useCases/searchForSongPosts';
 import { createErrorResponse, createResponse, LinksResponse } from '@/shared/apiResponses';
 import { Request, Response }                                  from 'express';
 import * as R                                                 from 'ramda';
-
-
-export { searchForSongPostsRoot, Env } from '@/music/searchForSongPosts.root';
+import { SearchSongPostsDto }                                 from '@/music/useCases/searchForSongPosts';
 
 
 export const transformRequest = (req: Request): Partial<SearchSongPostsDto> => {

@@ -40,7 +40,7 @@ export const getSettings: GetSettingsSafe = () => {
             message: 'could not load env',
             orig: err,
         }))
-        .chain(env => envCodec.decode(env.parsed)
+        .chain(_ => envCodec.decode(process.env)
             .mapLeft<SpotifyError>(errStr => ({
                 name: SpotifyErrorNames.CONFIG,
                 message: errStr,
@@ -48,7 +48,7 @@ export const getSettings: GetSettingsSafe = () => {
             })),
         )
         .map<SpotifyConfig>(settings => ({
-            authTokenFile: AUTH_FILE_DEFAULT,
+            authTokenFile: settings.SPOTIFY_CREDS_FILE || AUTH_FILE_DEFAULT,
             clientId: settings.SPOTIFY_CLIENT_ID,
             clientSecret: settings.SPOTIFY_SECRET,
             scopes: SCOPES,

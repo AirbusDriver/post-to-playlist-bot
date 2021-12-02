@@ -1,11 +1,9 @@
-import { getClient }                          from '@/infra/reddit';
 import { searchForSingleTrackControllerJson } from '@/music/http/controllers/searchForSingleTrack.controller.json';
-import { getSongPostsFromSubredditTaskRoot }  from '@infra/reddit/songPosts';
+import searchForSongPostsUseCase              from '@/music/useCases/searchForSongPosts';
 import { getSearchServiceTask }               from '@infra/spotify/adapters/searchService';
 import getRootLogger                          from '@shared/logger';
 import { json, Router }                       from 'express';
 import { EitherAsync }                        from 'purify-ts';
-import { searchForSongPostsRoot }             from '../searchForSongPosts.root';
 import { searchForManyTracksControllerJson }  from './controllers/searchForManyTracks.controller.json';
 import { searchSongPostJsonController }       from './controllers/searchForSongPosts.controller.json';
 
@@ -18,16 +16,10 @@ export const musicRouterFactoryTask = EitherAsync<any, Router>(async ctx => {
 
     router.use(json());
 
-    const redditClient = await ctx.liftEither(getClient());
-
     const searchService = await ctx.fromPromise(getSearchServiceTask.run());
 
-
     router.get('/song-posts',
-        searchSongPostJsonController(searchForSongPostsRoot({
-            spotifySearch: searchService,
-            getSongPostsFromReddit: getSongPostsFromSubredditTaskRoot(redditClient)
-        })));
+        searchSongPostJsonController(searchForSongPostsUseCase));
 
     router.post('/search/tracks', searchForManyTracksControllerJson(searchService));
 

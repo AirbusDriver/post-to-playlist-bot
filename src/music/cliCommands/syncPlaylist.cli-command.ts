@@ -1,4 +1,3 @@
-import { musicEventEmitter }                                            from '@/music/events';
 import { liftEA }                                                       from '@fns';
 import { accumWith, createArgument, createCommand, validatePathExists } from '@fns/cli';
 import { readFileSyncSafe }                                             from '@fns/fileIO';
@@ -7,10 +6,6 @@ import { Command }                                                      from 'co
 import { EitherAsync }                                                  from 'purify-ts';
 import syncPlaylistUseCase                                              from '../useCases/syncPlaylist';
 
-
-musicEventEmitter.on('playlistUpdated', (playlist, actions) => {
-    console.log(`${ playlist.item.name } updated... %j`, actions);
-});
 
 const syncAction = async (paths: string[], _: Command) => {
     await EitherAsync(async lifts => {

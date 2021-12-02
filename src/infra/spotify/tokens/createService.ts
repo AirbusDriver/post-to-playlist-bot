@@ -14,7 +14,7 @@ const logger = getSpotifyLogger().child({module: 'SpotifyAuth'});
 
 type CreateAuthTokenServiceTask = (client: SpotifyWebApi) => SpotifyAuthTokenService
 
-const AUTO_REFRESH_INTERVAL = 1000 * 60;
+const AUTO_REFRESH_INTERVAL = 1000 * 60 * 5;
 
 
 export const createAuthTokenService: CreateAuthTokenServiceTask =
@@ -34,7 +34,7 @@ export const createAuthTokenService: CreateAuthTokenServiceTask =
             fetchTokens,
             start: EitherAsync<SpotifyError, void>(async ctx => {
                 if (timer == null) {
-                    logger.info('beginning auto refresh');
+                    logger.debug('beginning auto refresh');
                     timer = await ctx.fromPromise(startAutoRefresh.run());
                     return;
                 }
@@ -42,7 +42,7 @@ export const createAuthTokenService: CreateAuthTokenServiceTask =
             }),
             stop: EitherAsync<SpotifyError, void>(async _ => {
                 if (timer != null) {
-                    logger.info('stopping auto-refresh');
+                    logger.debug('stopping auto-refresh');
                     clearInterval(timer);
                     return;
                 }

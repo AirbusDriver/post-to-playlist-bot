@@ -33,11 +33,11 @@ export const makeSpotifyTrackSlug: (track: SpotifyTrack) => string = R.pipe(
 export const trackEq: (track: TrackInfo, other: TrackInfo) => boolean = (track, other) => {
     return R.pipe(
         () => [ track, other ].map(makeTrackSlug),
-        R.apply(R.equals, R.__ as unknown as string[])
+        R.apply(R.equals, (R.__ as unknown as string[]))
     )();
 };
 
-export const spotifyTrackEq = (track: SpotifyTrack, other: SpotifyTrack): boolean => R.either(
+export const spotifyTrackEq = (track: SpotifyTrack, other: SpotifyTrack) => R.either(
     R.pipe(R.prop('item'), R.curry(trackEq)(track.item)),
     R.eqProps('id', track)
 )(other);

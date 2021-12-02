@@ -14,7 +14,7 @@ export type Validator<T> = (arg: string) => T;
 
 /**
  * Throw a commander.InvalidArgumentError from the message or message factory provided. This
- * exits the cli command parser
+ * exits the cliCommands command parser
  */
 export const invalid = (msgFn: ((arg: string) => string) | string) => (arg: string) => {
     const msg = typeof msgFn === 'function' ? msgFn(arg) : msgFn as string;

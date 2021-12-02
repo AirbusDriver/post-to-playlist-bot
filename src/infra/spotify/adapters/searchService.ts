@@ -1,5 +1,9 @@
-import { getAuthorizedClientTask }       from '@infra/spotify';
+import { getAuthorizedClientCache }      from '@infra/spotify';
+import { EitherAsync }                   from 'purify-ts';
 import { createSearchServiceFromClient } from '../search';
 
 
-export const getSearchServiceTask = getAuthorizedClientTask.map(createSearchServiceFromClient);
+export const getSearchServiceTask = EitherAsync(async lifts => {
+    const client = await lifts.fromPromise(getAuthorizedClientCache.getLazy());
+    return createSearchServiceFromClient(client);
+});

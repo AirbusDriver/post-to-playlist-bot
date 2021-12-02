@@ -9,7 +9,8 @@ import SpotifyWebApi                        from 'spotify-web-api-node';
 export { searchUserPlaylistsWithRoot, PlaylistItemIsResult } from './playlists';
 export { SpotifyAuthTokenService }                           from './tokens';
 
-export const getAuthorizedClientTask = EitherAsync<SpotifyError, SpotifyWebApi>(async ctx => {
+// todo: using this over the cached method could create redundant token managers
+const _getAuthorizedClientTask = EitherAsync<SpotifyError, SpotifyWebApi>(async ctx => {
     const client = await ctx.fromPromise(getClientWithAuthCredentialsTask.run());
     const authService = createAuthTokenService(client);
 
@@ -26,7 +27,7 @@ export const getAuthorizedClientTask = EitherAsync<SpotifyError, SpotifyWebApi>(
  *
  * @type {CacheIO<Promise<Either<SpotifyError, SpotifyWebApi>>>}
  */
-export const getAuthorizedClientCache = CacheIO.of(() => getAuthorizedClientTask.run());
+export const getAuthorizedClientCache = CacheIO.of(() => _getAuthorizedClientTask.ifLeft(console.error).run());
 
 export default getAuthorizedClientCache;
 
