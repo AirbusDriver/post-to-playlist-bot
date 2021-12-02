@@ -2,11 +2,11 @@
 
 ## What's This?
 
-This is a work in progress. It's really just a playground for me to figure out an acceptable FP architecture that looses
-operates like ports/adapters. But eventually it will be a deployable Node app that manage playlists from your personal
-Spotify account by syncing the music that is ItemDetails to Reddit. A simple config file will determine which playlists
-are to be managed and by which source. You can combine multiple subreddit sources as well as do things like leave the
-top 10 songs in the playlist, while keeping the current "hot 50" song in step with the playlist.
+This is a work in progress. It's really just a playground for me to figure out an acceptable FP architecture that
+loosely operates like ports/adapters. But eventually it will be a deployable Node app that manage playlists from your
+personal Spotify account by syncing the music that is ItemDetails to Reddit. A simple config file will determine which
+playlists are to be managed and by which source. You can combine multiple subreddit sources as well as do things like
+leave the top 10 songs in the playlist, while keeping the current "hot 50" song in step with the playlist.
 
 ## Roadmap
 
