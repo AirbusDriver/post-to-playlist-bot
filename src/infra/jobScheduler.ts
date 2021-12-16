@@ -12,8 +12,8 @@ declare module 'node-schedule' {
 }
 
 
-const startAll = () => {
-    logger.debug('beginning with env', {...process.env});
+export const startAll = () => {
+    logger.debug('beginning jobs with env', {...process.env});
     jobs.syncPlaylistsStart(logger)(jobs.config.syncPlaylistCron);
 };
 
@@ -23,4 +23,9 @@ process.on('SIGINT', () => {
         .then(() => process.exit(0));
 });
 
-startAll();
+export default startAll;
+
+// run as standalone script
+if (require.main == module) {
+    startAll();
+}

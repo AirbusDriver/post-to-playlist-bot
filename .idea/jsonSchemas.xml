@@ -32,6 +32,9 @@
                     <option name="path" value="myPlaylists" />
                     <option name="mappingKind" value="Directory" />
                   </Item>
+                  <Item>
+                    <option name="path" value="Scratches/deploy/myPlaylists/bot-test-playlist.json" />
+                  </Item>
                 </list>
               </option>
             </SchemaInfo>

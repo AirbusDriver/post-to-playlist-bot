@@ -1,4 +1,4 @@
-import appFactory from '@infra/server';
+import appFactory from '@infra/expressApp';
 
 
 const port = process.env.PORT || 5550;

@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+  server:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: reddit-dj-server
+    environment:
+      NODE_ENV:
+      REDDIT_SECRET:
+      REDDIT_CLIENT_ID:
+      REDDIT_USER_AGENT:
+      REDDIT_USERNAME:
+      REDDIT_PASSWORD:
+      SPOTIFY_CLIENT_ID:
+      SPOTIFY_SECRET:
+      SPOTIFY_CREDS_FILE: /deploy/spotifyAuth.json
+      SPOTIFY_CODE_FILE: /deploy/authCode.txt
+      PLAYLIST_DIR: /deploy/myPlaylists
+      PORT: 5550
+    ports:
+      - "5550"
+    volumes:
+      - .:/app
+    command: [ "npm", "run", "start:watch" ]
+

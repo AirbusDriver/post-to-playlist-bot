@@ -1,7 +1,7 @@
 /**
  *
  * Module containing three main tasks. One task that creates an unauthorized client
- * from the configurations found in the settings and .env files related to the parent project.
+ * from the configurations found in the settings and .env.production files related to the parent project.
  *
  * Another task that takes the result of that task and binds additional credentials
  * onto the client to prepare it for subsequent operations that require the authorization

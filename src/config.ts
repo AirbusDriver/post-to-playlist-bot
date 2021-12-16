@@ -4,4 +4,4 @@ import { config } from 'dotenv';
 
 config();
 
-export const PLAYLIST_DIR = process.env.PLAYLIST_DIR || './myPlaylists';
+export const PLAYLIST_DIR = process.env.PLAYLIST_DIR || './deploy/myPlaylists';
