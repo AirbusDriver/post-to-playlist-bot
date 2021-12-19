@@ -1,4 +1,4 @@
-import { musicRouterFactoryTask } from '@/music/http/router';
+import { musicRouterFactoryTask } from '@/music/infra/http/router';
 import { getRootLogger }          from '@shared/logger';
 import { json, Router }           from 'express';
 import { EitherAsync }            from 'purify-ts';

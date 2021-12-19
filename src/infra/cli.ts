@@ -1,4 +1,4 @@
-import musicCommand      from '@/music/cliCommands';
+import musicCommand      from '@/music/infra/cliCommands';
 import { createCommand } from '@fns/cli';
 
 

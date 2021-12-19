@@ -5,7 +5,7 @@ import { ifElse }               from 'ramda';
 import * as R                   from 'ramda';
 
 
-export { createCommand, createOption, createArgument } from 'commander';
+export { createCommand, createOption, createArgument, Command } from 'commander';
 
 
 export type CommanderParser<T, U> = (item: T, prev?: T) => U

@@ -223,7 +223,7 @@ export const searchForSongPostsUseCase: SearchForSongPostsTask = dto => {
         .mapLeft(err => ({
             name: ApplicationErrorNames.CONFIG,
             orig: err,
-            message: 'could not lost dependencies for searchForSongPosts'
+            message: 'could not load dependencies for searchForSongPosts'
         }))
         .ifLeft(console.error)
         .chain(fn => fn(dto));

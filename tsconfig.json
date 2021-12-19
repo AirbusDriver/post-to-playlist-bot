@@ -54,6 +54,9 @@
       ],
       "@fns": [
         "src/shared/fns/index.ts"
+      ],
+      "@tests/*": [
+        "tests/*"
       ]
     },
     /* Specify a set of entries that re-map imports to additional lookup locations. */

@@ -4,10 +4,10 @@ import { readFileSyncSafe }                                             from '@f
 import { parseJsonSafe }                                                from '@fns/json';
 import { Command }                                                      from 'commander';
 import { EitherAsync }                                                  from 'purify-ts';
-import syncPlaylistUseCase                                              from '../useCases/syncPlaylist';
+import syncPlaylistUseCase                                              from '../../useCases/syncPlaylist';
 
 
-const syncAction = async (paths: string[], _: Command) => {
+const syncFile = async (paths: string[], _: Command) => {
     await EitherAsync(async lifts => {
 
         const tasks = paths.map(
@@ -25,6 +25,7 @@ const syncAction = async (paths: string[], _: Command) => {
             console.error(err);
             process.exit(1);
         })
+        .void()
         .run();
 };
 
@@ -38,6 +39,6 @@ export const _command = (action: (paths: string[], cmd: Command) => Promise<void
     .action(action);
 
 
-export const syncPlaylistCommand = _command(syncAction);
+export const syncPlaylistCommand = _command(syncFile);
 
 export default syncPlaylistCommand;

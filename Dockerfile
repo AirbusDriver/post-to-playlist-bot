@@ -9,13 +9,12 @@ ARG env=production
 ENV NODE_ENV=$env
 ENV PORT=$port
 
+EXPOSE $PORT
+
 COPY ["package.json", "package-lock.json", "./"]
 
 RUN ["npm", "ci"]
 
-EXPOSE $PORT
-
 COPY . .
-
 
 CMD ["npm", "run", "start"]

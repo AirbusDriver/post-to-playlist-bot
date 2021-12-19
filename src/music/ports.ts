@@ -1,11 +1,10 @@
-import { SpotifyItem, SpotifyPlaylistInfo, TrackInfo } from '@/music/types';
-import { RedditError }                                 from '@infra/reddit/errors';
-import { GetSongPostsTask }                            from '@infra/reddit/songPosts/getSongPostsFromSubreddit.root';
-import { TrackSubmissionSummary }                      from '@infra/reddit/types';
-import { SpotifyError }                                from '@infra/spotify';
-import { QueryParams }                                 from '@infra/spotify/search/searchForTrack.root';
-import * as P                                          from 'purify-ts';
-import { EitherAsync }                                 from 'purify-ts';
+import { PlaylistRepoError }                                               from '@/music/playlistRepo/errors';
+import { PlaylistDefinition, SpotifyItem, SpotifyPlaylistInfo, TrackInfo } from '@/music/types';
+import { GetSongPostsTask }                                                from '@infra/reddit/songPosts/getSongPostsFromSubreddit.root';
+import { SpotifyError }                                                    from '@infra/spotify';
+import { QueryParams }                                                     from '@infra/spotify/search/searchForTrack.root';
+import * as P                                                              from 'purify-ts';
+import { EitherAsync }                                                     from 'purify-ts';
 
 
 export type SearchTrackDTO = { track: TrackInfo, params?: QueryParams }
@@ -27,6 +26,7 @@ export interface SearchService {
 }
 
 
+// todo: assign implementations
 export interface SongPostsService {
     getSongPostsTask: GetSongPostsTask;
 }
@@ -35,6 +35,13 @@ export interface SongPostsService {
 export type SearchForPlaylistById = (id: string) => EitherAsync<SpotifyError, SpotifyPlaylistInfo | null>
 
 
+// todo: assign implementations
 export interface PlaylistService {
     searchForPlaylistById: SearchForPlaylistById;
+}
+
+
+export interface PlaylistDefinitionRepo {
+    getAll: EitherAsync<PlaylistRepoError, PlaylistDefinition[]>;
+    getForId: (id: string) => EitherAsync<PlaylistRepoError, PlaylistDefinition>;
 }

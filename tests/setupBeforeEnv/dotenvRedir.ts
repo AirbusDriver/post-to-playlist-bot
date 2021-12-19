@@ -3,7 +3,7 @@ import * as P from 'purify-ts';
 import dotenv from 'dotenv';
 
 
-const env = path.join(process.cwd(), '.env.production.sample');
+const env = path.join(process.cwd(), '.env.sample');
 
 const debug: boolean = (process.env.DEBUG != null && ([ 'true', true, 1 ].includes(process.env.DEBUG)));
 
